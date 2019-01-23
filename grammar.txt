@@ -1,0 +1,97 @@
+
+1: unary 
+	: ID
+	| INT
+	| REAL
+	| STRING
+	| OPAREN expression CPAREN
+	| function_call
+	| array_index
+	| NOT unary
+
+
+2: operator 
+	: PLUS
+	| MINUS
+	| TIMES
+	| DIVIDE
+
+3: expression 
+	: unary
+	| unary operator unary
+	| unary comp unary
+
+4: expr_list
+	: expression
+	| opt_expr_list
+
+5: opt_expr_list
+	: expression opt_expr_list
+	| EMPTY
+
+6: param_list 
+	: unary
+	| unary COMMA paramList
+
+7: opt_param_list
+	: param_list
+	| EMPTY
+
+9: function_call 
+	: ID OPAREN opt_param_list CPAREN
+
+10: function_def 
+	: FUNCTION ID USING OPAREN opt_param_list CPAREN
+
+11: body
+	: OBRACE opt_expr_list CBRACE
+
+12: array_def
+	: LIST UNARY OBRACKET UNARY CBRACKET
+
+13: array_index
+	: UNARY OBRACKET UNARY CBRACKET
+
+14: vardef
+	: VAR ID EQUALS UNARY
+
+15: var_assign
+	: ID EQUALS unary
+
+16: var 
+	: ID
+
+17: comp
+	: GREATER
+	| LESS
+	| GREATEREQUAL
+	| GREATERLESS
+
+18: while
+	: LOOP WHILE condition_list body
+
+19: if
+	: IF condition_list expression
+	| IF condition_list body
+
+20: otherwise
+	: OTHERWISE expression
+	| OTHERWISE if
+
+21: linker
+	: AND
+	| OR
+
+22: condition_list
+	: expression comp expression
+	| expression comp expression linker condition_list
+
+23: return
+	: RETURN expression
+
+24: array_assign
+	: UNARY OBRACKET UNARY CBRACKET EQUALS expression
+
+25: rement
+	: INCREMENT unary
+	| DECREMENT unary
