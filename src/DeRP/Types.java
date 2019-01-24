@@ -1,4 +1,17 @@
 package DeRP;
 
-public class Types {
+public interface Types {
+
+    public static final String OPAREN= "OPAREN";
+    public static final String CPAREN= "CPAREN";
+    public static final String ID= "ID";
+    public static final String REAL= "REAL";
+    public static final String STRING= "STRING";
+    public static final String PLUS= "PLUS";
+    public static final String TIMES = "TIMES";
+    public static final String MINUS= "MINUS";
+    public static final String DIVIDES= "DIVIDES";
+
+
+
 }

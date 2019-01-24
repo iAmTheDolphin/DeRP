@@ -1,5 +1,3 @@
-
-
 function Backwards using (string) {
     array x[6]
 }
