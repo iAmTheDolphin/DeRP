@@ -1,6 +1,7 @@
 package DeRP;
 
-class Lexeme {
+
+class Lexeme implements Types{
 
     String type;
     int intVal;
@@ -11,7 +12,6 @@ class Lexeme {
     Lexeme right;
 
     Lexeme() {
-
     }
 
     Lexeme(String type, String str ) {
@@ -35,6 +35,12 @@ class Lexeme {
         this.realVal = realVal;
         this.type = type;
         lineNumber = Scanner.lineNumber;
+        left = null;
+        right = null;
+    }
+
+    Lexeme(String type) {
+        this.type = type;
         left = null;
         right = null;
     }

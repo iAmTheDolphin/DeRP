@@ -1,4 +1,5 @@
-function Backwards using (string) {
+test
+function backwards using (string) {
     array x[6]
 }
 

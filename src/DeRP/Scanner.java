@@ -28,6 +28,7 @@ public class Scanner {
 
             lex.lex();
             System.out.println("DONE LEXING!");
+            System.out.println((char) -1);
             //this is where the code for reading each character goes
 
         }
