@@ -21,6 +21,7 @@ public class Lexer implements Types{
         keyWords.put("otherwise", "OTHERWISE");
         keyWords.put("and", "AND");
         keyWords.put("or", "OR");
+        keyWords.put("while", "WHILE");
 
         this.pushStream = pushStream;
     }
@@ -43,10 +44,36 @@ public class Lexer implements Types{
             case '*': return new Lexeme(TIMES);
             case '-': return new Lexeme(MINUS);
             case '/': return new Lexeme(DIVIDES);
-            case '<': return new Lexeme(LESSTHAN);
-            case '>': return new Lexeme(GREATERTHAN);
-            case '=': return new Lexeme(ASSIGN);
+            case '<': {
+                int x = readChar();
+                if (x == '=') { //if it is <=
+                    return new Lexeme(LESSTHANEQUAL);
+                } else { //if it is just <
+                    pushBack((char) x);
+                    return new Lexeme(LESSTHAN);
+                }
+            }
+            case '>': {
+                int x = readChar();
+                if (x == '=') { //if it is >=
+                    return new Lexeme(GREATERTHANEQUAL);
+                } else { //if it is just >
+                    pushBack((char) x);
+                    return new Lexeme(GREATERTHAN);
+                }
+            }
+            case '=':
+                int x = readChar();
+                if(x == '=') { //if it is ==
+                    return new Lexeme(EQUALS);
+                }
+                else { //if it is just =
+                    pushBack((char) x);
+                    return new Lexeme(ASSIGN);
+                }
             case ';': return new Lexeme(SEMICOLON);
+            case '[': return new Lexeme(OBRACKET);
+            case ']': return new Lexeme(CBRACKET);
             default:
                 if(Character.isDigit(curr)) {
                     pushBack(curr);
@@ -76,7 +103,7 @@ public class Lexer implements Types{
 
         while (returned != -1 && ch != '\"') {
             buffer += ch;
-            readChar();
+            ch = readChar();
         }
         return new Lexeme(STRING, buffer);
     }

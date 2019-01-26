@@ -1,11 +1,7 @@
-function backwards using (string) {
-    array x[6]
-}
-
 
 function main () {
     
-    loop while x > 0 {
+    loop while x >= 0 {
         print(x + " Bottles of Beer on the wall")
         x--
     }
@@ -14,4 +10,8 @@ function main () {
 
     backwards(string)
 
+}
+
+function backwards using (string) {
+    array x[6]
 }
