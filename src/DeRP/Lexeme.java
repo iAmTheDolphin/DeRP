@@ -11,8 +11,6 @@ class Lexeme implements Types{
     Lexeme left;
     Lexeme right;
 
-    Lexeme() {
-    }
 
     Lexeme(String type, String str ) {
         //make a lexeme
@@ -26,9 +24,10 @@ class Lexeme implements Types{
     Lexeme(String type, int intVal) {
         this.type = type;
         this.intVal = intVal;
-        lineNumber = Scanner.lineNumber;
-        left = null;
-        right = null;
+        this.strVal = null;
+        this.lineNumber = Scanner.lineNumber;
+        this.left = null;
+        this.right = null;
     }
 
     Lexeme(String type, double realVal) {
@@ -41,8 +40,13 @@ class Lexeme implements Types{
 
     Lexeme(String type) {
         this.type = type;
-        left = null;
-        right = null;
+        this.left = null;
+        this.right = null;
+        this.lineNumber = Scanner.lineNumber;
+    }
+
+    public void display() {
+        System.out.println(this.type + " on line " + this.lineNumber + " : " + this.intVal + this.realVal + this.strVal);
     }
 
 }

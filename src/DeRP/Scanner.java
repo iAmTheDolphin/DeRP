@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.io.PushbackInputStream;
 
 
-public class Scanner {
+public class Scanner implements Types{
 
     public static int lineNumber = 1;
 
@@ -25,10 +25,13 @@ public class Scanner {
             int x = pStream.available();
             //System.out.println(x);
             Lexer lex = new Lexer(pStream);
+            Lexeme token = lex.lex();
+            while(!token.type.equals(EOF)) {
+                token.display();
+                token = lex.lex();
+            }
 
-            lex.lex();
             System.out.println("DONE LEXING!");
-            System.out.println((char) -1);
             //this is where the code for reading each character goes
 
         }

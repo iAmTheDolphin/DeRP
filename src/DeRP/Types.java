@@ -4,6 +4,8 @@ public interface Types {
 
     public static final String OPAREN= "OPAREN";
     public static final String CPAREN= "CPAREN";
+    public static final String OBRACE= "OBRACE";
+    public static final String CBRACE= "CBRACE";
     public static final String PLUS= "PLUS";
     public static final String TIMES = "TIMES";
     public static final String MINUS= "MINUS";
@@ -13,6 +15,8 @@ public interface Types {
     public static final String GREATERTHAN= "GREATERTHAN";
     public static final String ASSIGN= "ASSIGN";
     public static final String SEMICOLON= "SEMICOLON";
+    public static final String UNKNOWN= "UNKNOWN";
+    public static final String EOF= "EOF";
 
     public static final String ID= "ID";
     public static final String REAL= "REAL";

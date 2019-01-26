@@ -14,6 +14,7 @@ public class Lexer implements Types{
     Lexer(PushbackInputStream pushStream) {
         keyWords = new Hashtable();
         keyWords.put("function", "FUNCTION");
+        keyWords.put("array", "ARRAY");
         keyWords.put("using", "USING");
         keyWords.put("variable", "VARIABLE");
         keyWords.put("loop", "LOOP");
@@ -29,53 +30,57 @@ public class Lexer implements Types{
         char curr;
 
         skipWhiteSpace();
+        curr = readChar();
+        if( returned == -1 ) System.out.println("EOF!");
 
-        try{
-            curr = readChar();
-            if( returned == -1 ) System.out.println("EOF!");
-
-            switch (curr) {
-                case '(': return new Lexeme(OPAREN);
-                case ')': return new Lexeme(CPAREN);
-                case ',': return new Lexeme(COMMA);
-                case '+': return new Lexeme(PLUS); //what about ++ and += ?
-                case '*': return new Lexeme(TIMES);
-                case '-': return new Lexeme(MINUS);
-                case '/': return new Lexeme(DIVIDES);
-                case '<': return new Lexeme(LESSTHAN);
-                case '>': return new Lexeme(GREATERTHAN);
-                case '=': return new Lexeme(ASSIGN);
-                case ';': return new Lexeme(SEMICOLON);
-                default:
-                    if(Character.isDigit(curr)) {
-                        pushBack(curr);
-                        return lexNumber();
-                    }
-                    else if (Character.isLetter(curr)) {
-                        pushBack(curr);
-                        return lexVariableOrKeyword();
-                    }
-                    else if (curr == '\"'){
-                        pushBack(curr);
-                        return lexString();
-                    }
-            }
-            while ( returned != -1 ) {
-                System.out.println(curr);
-                returned = pushStream.read();
-                curr = (char) returned;
-            }
+        switch (curr) {
+            case '(': return new Lexeme(OPAREN);
+            case ')': return new Lexeme(CPAREN);
+            case '{': return new Lexeme(OBRACE);
+            case '}': return new Lexeme(CBRACE);
+            case ',': return new Lexeme(COMMA);
+            case '+': return new Lexeme(PLUS); //what about ++ and += ?
+            case '*': return new Lexeme(TIMES);
+            case '-': return new Lexeme(MINUS);
+            case '/': return new Lexeme(DIVIDES);
+            case '<': return new Lexeme(LESSTHAN);
+            case '>': return new Lexeme(GREATERTHAN);
+            case '=': return new Lexeme(ASSIGN);
+            case ';': return new Lexeme(SEMICOLON);
+            default:
+                if(Character.isDigit(curr)) {
+                    pushBack(curr);
+                    return lexNumber();
+                }
+                else if (Character.isLetter(curr)) {
+                    pushBack(curr);
+                    return lexVariableOrKeyword();
+                }
+                else if (curr == '\"'){
+                    return lexString();
+                }
+                else if(returned == -1){
+                    return new Lexeme(EOF, curr);
+                }
+                else{
+                    return new Lexeme(UNKNOWN, curr);
+                }
         }
-        catch ( IOException e ) {
-            e.printStackTrace();
-        }
-        return new Lexeme();
-
     }
 
+
+    //FIXME this is causing an infinite loop. probably something with the quotes
     private Lexeme lexString() {
-        return new Lexeme();
+        String buffer = "";
+        char ch = readChar();
+
+        while (returned != -1 && ch != '\"') {
+            buffer += ch;
+            readChar();
+        }
+        return new Lexeme(STRING, buffer);
     }
+
 
     private Lexeme lexNumber() {
         int real = 0;
@@ -104,7 +109,6 @@ public class Lexer implements Types{
 
 
     private Lexeme lexVariableOrKeyword() {
-
         int keyword = 0;
         String buffer = "";
         char ch;
@@ -116,28 +120,22 @@ public class Lexer implements Types{
         }
         pushBack(ch);
 
-        System.out.println("Starting the TEST");
-
         if(keyWords.get(buffer) == null) {
-            //not a keyword but a variable
-            System.out.println("not a keyword");
+            //it is a variable
+            return new Lexeme(ID, buffer);
         }
         else {
+            //it is a keyword
             return new Lexeme(keyWords.get(buffer).toString(), buffer);
         }
-//        if(keyWords.get(buffer))
-        return new Lexeme("");
-//        //TODO finish this
-
     }
 
 
     private char readChar() {
         try {
             returned = pushStream.read();
-            char curr = (char) returned;
-            System.out.println(curr);
-            return curr;
+            if(returned == (int) '\n') Scanner.lineNumber++;
+            return (char) returned;
         }
         catch(IOException e) {
             e.printStackTrace();
@@ -149,12 +147,11 @@ public class Lexer implements Types{
 
     public void skipWhiteSpace() {
         char curr = readChar();
-        while (Character.isWhitespace(curr)) {
+        while (Character.isWhitespace(curr) || curr == '\n') {
             curr = readChar();
         }
         pushBack(curr);
     }
-
 
 
     private void pushBack(char c) {
