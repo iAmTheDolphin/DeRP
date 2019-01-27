@@ -30,6 +30,9 @@ public class Scanner implements Types{
             Lexeme token = lex.lex();
             while(!token.type.equals(EOF)) {
                 token.display();
+                if(token.type == UNKNOWN || token.type == BAD_NUMBER) {
+                    break;
+                }
                 token = lex.lex();
             }
         }

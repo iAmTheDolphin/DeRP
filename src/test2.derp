@@ -1,0 +1,19 @@
+function thisfunction() {
+
+    function interiorFunction(x) {
+        print(x + " this is printing from interior function")
+    }
+
+    variable x = 1;
+
+    interiorFunction(x)
+    interiorFunction(x + 1)
+
+}
+
+//this is a comment
+function main () {
+
+    thisFunction()
+
+}

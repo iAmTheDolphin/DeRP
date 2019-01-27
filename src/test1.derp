@@ -1,10 +1,16 @@
+//DERP test1.derp
+//Parker Jones
+
 function test1 (x, y, z) {
 
-	if x >= y {
-		z = x
-	}
+    if x >= y {
+        z = x
+    }
 	otherwise if x == z {
-		y = z
-	} 
+        y = z
+    }
+}
 
+function main() {
+    test1()
 }

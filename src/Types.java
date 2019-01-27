@@ -1,4 +1,5 @@
-
+//Types.java
+//Parker Jones
 
 public interface Types {
 

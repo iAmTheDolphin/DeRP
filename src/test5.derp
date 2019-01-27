@@ -1,0 +1,10 @@
+function test() {
+    //this is a function that will fail.
+
+    variable x = 0
+
+    loop while x < 100 {
+        x++;
+    }
+!!!
+}

@@ -1,0 +1,10 @@
+function main() {
+
+    variable bottles = 99
+
+    loop while bottles >= 0 {
+        print (bottles + " Bottles of beer on the wall")
+        x-- //take one down and pass it around
+    }
+
+}

@@ -1,4 +1,5 @@
-
+//Lexeme.java
+//Parker Jones
 class Lexeme implements Types{
 
     String type;
