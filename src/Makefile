@@ -18,7 +18,7 @@ default: classes
 classes: $(CLASSES:.java=.class)
 
 scanner : Scanner.class
-	$(JVM) program.derp
+	$(JC) Scanner.java
 
 test1 : Scanner.class
 	$(JVM) test1.derp
