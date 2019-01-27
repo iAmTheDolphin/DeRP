@@ -1,0 +1,8 @@
+function bananas() {
+	print("there are no bananas here")
+
+}
+
+function print(str) {
+	str = "Actually there are"
+}
