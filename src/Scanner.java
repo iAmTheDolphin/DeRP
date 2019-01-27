@@ -1,4 +1,3 @@
-package DeRP;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -15,7 +14,7 @@ public class Scanner implements Types{
 
 
     public static void main(String[] args) {
-        file = new File("/Users/parker/Desktop/DRP/program.txt") ;
+        file = new File(args[0]) ;
 
         try {
             iStream = new FileInputStream(file);
@@ -30,10 +29,6 @@ public class Scanner implements Types{
                 token.display();
                 token = lex.lex();
             }
-
-            System.out.println("DONE LEXING!");
-            //this is where the code for reading each character goes
-
         }
         catch(IOException error) {
             error.printStackTrace();

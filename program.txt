@@ -1,5 +1,22 @@
-
-//comment
-
-//second comments here
+!
 function main () {
+
+    //comment here for hare
+    loop while x >= 0 {
+        print(x + " Bottles of Beer on the wall")
+        x--
+    } !
+
+    var x = 9.9.9
+
+    //and how we create variables
+    variable str = "We hold Strings here too"
+
+    backwards(string)
+
+}
+
+//this function lost some of its body
+function backwards using (string) {
+    array x[6]
+}
