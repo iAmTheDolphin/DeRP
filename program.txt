@@ -1,17 +1,5 @@
 
+//comment
+
+//second comments here
 function main () {
-    
-    loop while x >= 0 {
-        print(x + " Bottles of Beer on the wall")
-        x--
-    }
-
-    variable str = "We hold Strings here too"
-
-    backwards(string)
-
-}
-
-function backwards using (string) {
-    array x[6]
-}

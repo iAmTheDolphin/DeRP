@@ -3,14 +3,16 @@ package DeRP;
 public interface Types {
 
     public static final String OPAREN= "OPAREN";
-    public static final String CPAREN= "CPAREN";
+    static final String CPAREN= "CPAREN";
     public static final String OBRACE= "OBRACE";
     public static final String CBRACE= "CBRACE";
     public static final String OBRACKET= "OBRACKET";
     public static final String CBRACKET= "CBRACKET";
     public static final String PLUS= "PLUS";
+    public static final String INCREMENT= "INCREMENT";
     public static final String TIMES = "TIMES";
     public static final String MINUS= "MINUS";
+    public static final String DECREMENT= "DECREMENT";
     public static final String DIVIDES= "DIVIDES";
     public static final String COMMA= "COMMA";
     public static final String LESSTHAN= "LESSTHAN";
