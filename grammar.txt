@@ -1,5 +1,4 @@
-
-1: unary 
+unary
 	: INT
 	| REAL
 	| STRING
@@ -8,39 +7,37 @@
 	| NOT unary
 
 var_expr
-    	: ID
-    	| ID OPAREN opt_param_list CPAREN
-    	| UNARY OBRACKET UNARY CBRACKET
+    : ID
+    | ID OPAREN opt_param_list CPAREN
+    | ID OBRACKET UNARY CBRACKET
 
 2: operator
 	: PLUS
 	| MINUS
 	| TIMES
-	| DIVIDE
+	| DIVIDES
 
 expression
-    	: unary_expr
-    	| if
-    	| loop
-    	| otherwise
-
+    : unary_expr
+    | if
+    | loop
+    | otherwise
 
 unary_expr
-    	: unary
-    	| unary operator unary
-    	| unary comp unary
+    : unary
+    | unary operator unary
+    | unary comp unary
 
 expr_list
 	: expression
-	| opt_expr_list
+	| expression expr_list
 
 opt_expr_list
 	: expression opt_expr_list
 	| EMPTY
 
-
 defs
-: function_def
+    : function_def
 	| array_def
 	| var_def
 
@@ -59,38 +56,44 @@ defs
 	: OBRACE opt_expr_list CBRACE
 
 12: array_def
-	: LIST UNARY OBRACKET UNARY CBRACKET
+	: LIST unary OBRACKET UNARY CBRACKET
 
 14: var_def
-	: VAR ID EQUALS UNARY
+	: VAR ID EQUALS unary
 
 15: var_assign
 	: ID EQUALS unary
-
 
 17: comp
 	: GREATER
 	| LESS
 	| GREATEREQUAL
 	| GREATERLESS
+	| NOTEQUAL
 
 loop :
 	| while
 
 18: while
 	: LOOP WHILE condition_list body
+	| LOOP WHILE condition_list expression
 
 19: if
-	: IF condition_list expression
-	| IF condition_list body
+	: IF condition_list expression opt_otherwise
+	| IF condition_list body opt_otherwise
 
-20: otherwise
+opt_otherwise
+    : otherwise
+    | EMPTY
+
+otherwise
 	: OTHERWISE expression
 	| OTHERWISE if
 
-21: linker
+linker
 	: AND
 	| OR
+	| NOT
 
 22: condition_list
 	: expression comp expression

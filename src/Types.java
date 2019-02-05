@@ -20,6 +20,7 @@ public interface Types {
     String LESSTHANEQUAL= "LESSTHANEQUAL";
     String GREATERTHAN= "GREATERTHAN";
     String GREATERTHANEQUAL= "GREATERTHANEQUAL";
+    String NOTEQUAL= "NOTEQUAL";
     String ASSIGN= "ASSIGN";
     String EQUALS= "EQUALS";
     String SEMICOLON= "SEMICOLON";
@@ -33,4 +34,13 @@ public interface Types {
     String INT= "INT";
     String STRING= "STRING";
     String BAD_NUMBER= "BAD_NUMBER";
+    String ARRAY= "ARRAY";
+    String LIST= "LIST";
+    String VAR= "VAR";
+    String IF= "IF";
+    String WHILE= "WHILE";
+    String LOOP= "LOOP";
+    String OTHERWISE= "OTHERWISE";
+    String AND= "AND";
+    String OR= "OR";
 }
