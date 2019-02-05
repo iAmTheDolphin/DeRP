@@ -10,6 +10,10 @@ class Lexeme implements Types{
     Lexeme left;
     Lexeme right;
 
+    Lexeme() {
+        System.out.println("If you see this, you accidentally did Lexeme() constructor with no arguments. ");
+    }
+
 
     Lexeme(String type, String str ) {
         //make a lexeme

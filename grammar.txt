@@ -1,35 +1,50 @@
 
 1: unary 
-	: ID
-	| INT
+	: INT
 	| REAL
 	| STRING
 	| OPAREN expression CPAREN
-	| function_call
-	| array_index
+	| var_expr
 	| NOT unary
 
+var_expr
+    	: ID
+    	| ID OPAREN opt_param_list CPAREN
+    	| UNARY OBRACKET UNARY CBRACKET
 
-2: operator 
+2: operator
 	: PLUS
 	| MINUS
 	| TIMES
 	| DIVIDE
 
-3: expression 
-	: unary
-	| unary operator unary
-	| unary comp unary
+expression
+    	: unary_expr
+    	| if
+    	| loop
+    	| otherwise
 
-4: expr_list
+
+unary_expr
+    	: unary
+    	| unary operator unary
+    	| unary comp unary
+
+expr_list
 	: expression
 	| opt_expr_list
 
-5: opt_expr_list
+opt_expr_list
 	: expression opt_expr_list
 	| EMPTY
 
-6: param_list 
+
+defs
+: function_def
+	| array_def
+	| var_def
+
+ param_list
 	: unary
 	| unary COMMA paramList
 
@@ -37,10 +52,7 @@
 	: param_list
 	| EMPTY
 
-9: function_call 
-	: ID OPAREN opt_param_list CPAREN
-
-10: function_def 
+10: function_def
 	: FUNCTION ID USING OPAREN opt_param_list CPAREN
 
 11: body
@@ -49,23 +61,21 @@
 12: array_def
 	: LIST UNARY OBRACKET UNARY CBRACKET
 
-13: array_index
-	: UNARY OBRACKET UNARY CBRACKET
-
-14: vardef
+14: var_def
 	: VAR ID EQUALS UNARY
 
 15: var_assign
 	: ID EQUALS unary
 
-16: var 
-	: ID
 
 17: comp
 	: GREATER
 	| LESS
 	| GREATEREQUAL
 	| GREATERLESS
+
+loop :
+	| while
 
 18: while
 	: LOOP WHILE condition_list body
@@ -95,3 +105,14 @@
 25: rement
 	: INCREMENT unary
 	| DECREMENT unary
+
+program
+    	: opt_func_def_list
+
+opt_func_def_list
+    	: func_def_list
+    	| EMPTY
+
+func_def_list
+    	: function_def func_def_list
+    	| function_def
