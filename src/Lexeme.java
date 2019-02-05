@@ -70,4 +70,26 @@ class Lexeme implements Types{
         //System.out.println(this.type + " on line " + this.lineNumber + " : " + this.intVal + this.realVal + this.strVal);
     }
 
+    public void debug() {
+        if (this.type == INT) {
+            System.out.println(this.type + " : " + this.intVal);
+        }
+        else if (this.type == STRING || this.type.equals(ID)) {
+            System.out.println(this.type + " : " + this.strVal);
+        }
+        else if (this.type == REAL) {
+            System.out.println(this.type + " : " + this.realVal);
+        }
+        else if (this.type == UNKNOWN) {
+            System.out.println("ERROR: " + this.type + " on line " + this.lineNumber + " : " + (char)this.intVal);
+        }
+        else if (this.type == BAD_NUMBER) {
+            System.out.println("ERROR: " + this.type + " on line " + this.lineNumber + " : " + this.strVal);
+        }
+        else {
+            System.out.println(this.type);
+        }
+        //System.out.println(this.type + " on line " + this.lineNumber + " : " + this.intVal + this.realVal + this.strVal);
+    }
+
 }

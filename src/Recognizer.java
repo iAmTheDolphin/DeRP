@@ -5,6 +5,9 @@ import java.io.PushbackInputStream;
 
 public class Recognizer implements Types{
 
+    private static final boolean debug = true;
+    private static int recursionDepth = 0;
+
     public static int lineNumber = 1;
 
     private static File file;
@@ -20,23 +23,28 @@ public class Recognizer implements Types{
         file = new File(args[0]);
 
         lex = new Lexer(file);
-
-        current.display();
-
+        advance();
+        program();
+        System.out.println("LEGAL");
     }
 
-    private Lexeme advance() {
+    private static Lexeme advance() {
         Lexeme prev = current;
         current = lex.lex();
+        if(debug){
+            System.out.print(recursionDepth + "  ");
+            current.debug();
+        }
         return prev;
     }
 
-    private boolean check(String type) {
+    private static boolean check(String type) {
         return current.type.equals(type);
     }
 
-    private Lexeme match(String type){
+    private static Lexeme match(String type){
         if(check(type)) {
+            if(debug) System.out.println("Matched and grabbing next lexeme");
             return advance();
         }
         else {
@@ -47,24 +55,29 @@ public class Recognizer implements Types{
         }
     }
 
-    private void program() {
+    private static void program() {
+        recursionDepth++;
+        if(debug) System.out.println("DEBUG: program");
         defs();
         if (programPending()) {
             program();
         }
+        recursionDepth--;
     }
 
-    //fixme I dont think this works
-    private boolean programPending() {
+    private static boolean programPending() {
         return defsPending();
     }
 
-    private boolean defsPending() {
+    private static boolean defsPending() {
         if(functionDefPending() || arrayDefPending() || varDefPending()) return true;
         else return false;
     }
 
-    private void defs() {
+    private static void defs() {
+        recursionDepth++;
+        if(debug) System.out.println("DEBUG: defs " + recursionDepth);
+
         if(functionDefPending()) {
             functionDef();
         }
@@ -74,63 +87,81 @@ public class Recognizer implements Types{
         else {
             varDef();
         }
+        recursionDepth --;
     }
 
-    private boolean arrayDefPending() {
+    private static boolean arrayDefPending() {
         return check(ARRAY);
     }
 
-    private void arrayDef() {
+    private static void arrayDef() {
+        recursionDepth++;
+        if(debug) System.out.println("DEBUG: array def " + recursionDepth);
+
         match(LIST);
         unary();
         match(OBRACKET);
         unary();
         match(CBRACKET);
+        recursionDepth--;
     }
 
-    private boolean varDefPending() {
+    private static boolean varDefPending() {
         return check(VAR);
     }
 
-    private void varDef() {
+    private static void varDef() {
+        recursionDepth++;
+        if(debug) System.out.println("DEBUG: var def " + recursionDepth);
+
         match(VAR);
         match(ID);
         match(EQUALS);
         unary();
+        recursionDepth--;
     }
 
-    private void functionDef () {
-        if(functionDefPending()) { //fixme
-            match(FUNCTION);
-            match(ID);
-            match(USING);
-            match(OPAREN);
-            if(paramListPending()) {
-                paramList();
-            }
-            match(CPAREN);
-            body();
+    private static void functionDef () {
+        recursionDepth++;
+        if(debug) System.out.println("DEBUG: function def " + recursionDepth);
+
+        match(FUNCTION);
+        match(ID);
+        match(USING);
+        match(OPAREN);
+        if(!check(CPAREN)) {
+            paramList();
         }
+        match(CPAREN);
+        body();
+        recursionDepth--;
     }
 
-    //fixme this def doesnt work.
-    private boolean functionDefPending() {
+    //fixme this might not work.
+    private static boolean functionDefPending() {
         return check(FUNCTION);
     }
 
-    private void paramList() {
+    private static void paramList() {
+        recursionDepth++;
+        if(debug) System.out.println("DEBUG: param list " + recursionDepth);
+
         unary();
-        match(COMMA);
         if(paramListPending()) {
+            match(COMMA);
             paramList();
         }
+        recursionDepth--;
     }
 
-    private boolean paramListPending() {
-        return unaryPending();
+    private static boolean paramListPending() {
+        return check(COMMA);
     }
 
-    private void unary() {
+    private static void unary() {
+        recursionDepth++;
+        if(debug) System.out.println("DEBUG: unary " + recursionDepth);
+
         if(check(INT)){
             match(INT);
         }
@@ -148,63 +179,80 @@ public class Recognizer implements Types{
         else if (varExprPending()) {
             varExpr();
         }
-        else {
+        else if(check(NOT)){
             match(NOT);
             unary();
         }
+        recursionDepth--;
     }
 
-    private boolean unaryPending() {
+    private static boolean unaryPending() {
         if(check(INT) || check(REAL) || check(STRING) || check(OPAREN) || varExprPending() || check(NOT))
             return true;
         else return false;
     }
 
-    private boolean varExprPending() {
+    private static boolean varExprPending() {
         return check(ID);
     }
 
-    private void varExpr() {
+    private static void varExpr() {
+        recursionDepth++;
+        if(debug) System.out.println("DEBUG: var expr " + recursionDepth);
+
         match(ID);
         if(check(OPAREN)) {
             match(OPAREN);
             if(paramListPending()) paramList();
             match(CPAREN);
         }
-        else {
+        else if(check(OBRACKET)) {
             match(OBRACKET);
             unary();
             match(CBRACKET);
         }
+        recursionDepth--;
     }
 
-    private boolean bodyPending() {
+    private static boolean bodyPending() {
         return check(OBRACE);
     }
 
-    private void body() {
+    private static void body() {
+        recursionDepth++;
+        if(debug) System.out.println("DEBUG: body " + recursionDepth);
+
         match(OBRACE);
         if(exprListPending())exprList();
         match(CBRACE);
+        recursionDepth--;
     }
 
-    private boolean exprListPending() {
+    private static boolean exprListPending() {
         return expressionPending();
     }
 
-    private void exprList() {
+    private static void exprList() {
+        recursionDepth++;
+        if(debug) System.out.println("DEBUG: expr list " + recursionDepth);
+
         expression();
         if(expressionPending()) exprList();
+
+        recursionDepth--;
     }
 
-    private boolean expressionPending() {
+    private static boolean expressionPending() {
         if( ifdefPending() || loopPending() || unaryExprPending()) {
             return true;
         }
         else return false;
     }
 
-    private void expression() {
+    private static void expression() {
+        recursionDepth++;
+        if(debug) System.out.println("DEBUG: expression " + recursionDepth);
+
         if(loopPending()) {
             loop();
         }
@@ -214,100 +262,146 @@ public class Recognizer implements Types{
         else{ //unary expressions
             unaryExpr();
         }
+        recursionDepth--;
     }
 
-    private boolean unaryExprPending() {
+    private static boolean unaryExprPending() {
         return unaryPending();
     }
 
-    private void unaryExpr() {
+    private static void unaryExpr() {
+        recursionDepth++;
+        if(debug) System.out.println("DEBUG: unary expr " + recursionDepth);
+
         unary();
         if(operatorPending()) {
             operator();
         }
-        else {
+        else if (compPending()){
             comp();
         }
         unary();
+        recursionDepth--;
     }
 
-    private boolean operatorPending() {
-        if(check(PLUS) || check(MINUS) || check(TIMES) || check(DIVIDES)){
+
+
+    private static boolean operatorPending() {
+        if(check(PLUS) || check(MINUS) || check(TIMES) || check(DIVIDES) || check(ASSIGN)){
             return true;
         }
         else return false;
     }
 
-    private void operator() {
+    private static void operator() {
+        recursionDepth++;
+        if(debug) System.out.println("DEBUG: operator " + recursionDepth);
+
         if(check(PLUS)) match(PLUS);
         else if(check(MINUS)) match(MINUS);
         else if(check(TIMES)) match(TIMES);
-        else match(DIVIDES);
+        else if(check(DIVIDES))match(DIVIDES);
+        else match(ASSIGN);
+        recursionDepth--;
     }
 
-    private void comp() {
+    private static boolean compPending() {
+        if(check(GREATERTHANEQUAL) || check(LESSTHANEQUAL) || check(LESSTHAN) || check(GREATERTHAN) || check(NOTEQUAL) || check(EQUALS))
+            return true;
+        else return false;
+    }
+
+    private static void comp() {
+        recursionDepth++;
+        if(debug) System.out.println("DEBUG: comp " + recursionDepth);
+
         if(check(GREATERTHAN)) match(GREATERTHAN);
         else if(check(LESSTHAN)) match(LESSTHAN);
         else if(check(GREATERTHANEQUAL)) match(GREATERTHANEQUAL);
-        else match(LESSTHANEQUAL);
+        else if (check(LESSTHANEQUAL))match(LESSTHANEQUAL);
+        else if(check(NOTEQUAL))match(NOTEQUAL);
+        else match(EQUALS);
+        recursionDepth--;
     }
 
-    private boolean ifdefPending() {
+    private static boolean ifdefPending() {
         return check(IF);
     }
 
-    private void ifdef() {
+    private static void ifdef() {
+        recursionDepth++;
+        if(debug) System.out.println("DEBUG: ifdef " + recursionDepth);
+
         match(IF);
         conditionList();
         if(bodyPending()) body();
         else expression();
         if(otherwisePending()) otherwise();
+        recursionDepth--;
     }
 
-    private boolean loopPending() {
+    private static boolean loopPending() {
         return check(LOOP);
     }
 
-    private void loop(){
+    private static void loop(){
+        recursionDepth++;
+        if(debug) System.out.println("DEBUG: loop " + recursionDepth);
+
         match(LOOP);
         whileLoop();
+        recursionDepth--;
     }
 
-    private void whileLoop() {
+    private static void whileLoop() {
+        recursionDepth++;
+        if(debug) System.out.println("DEBUG: while loop " + recursionDepth);
+
         match(WHILE);
         conditionList();
         if(bodyPending()) body();
         else expression();
+
+        recursionDepth--;
     }
 
-    private boolean otherwisePending() {
+    private static boolean otherwisePending() {
         return check(OTHERWISE);
     }
 
-    private void otherwise() {
+    private static void otherwise() {
+        recursionDepth++;
+        if(debug) System.out.println("DEBUG: otherwise " + recursionDepth);
+
         match(OTHERWISE);
         if(expressionPending()) expression();
         else ifdef();
+        recursionDepth--;
     }
 
-    private void conditionList() {
-        expression();
-        comp();
+    private static void conditionList() {
+        recursionDepth++;
+        if(debug) System.out.println("DEBUG: condition list " + recursionDepth);
+
         expression();
         if(linkerPending()) {
             linker();
             conditionList();
         }
+        recursionDepth--;
     }
 
-    private boolean linkerPending() {
+    private static boolean linkerPending() {
         if(check(AND) || check(OR) || check(NOT)){
             return true;
         }
         else return false;
     }
 
-    private void linker() {
+    private static void linker() {
+        recursionDepth++;
+        if(debug) System.out.println("DEBUG: linker " + recursionDepth);
+
         if(check(NOT)) {
             match(NOT);
         }
@@ -317,6 +411,7 @@ public class Recognizer implements Types{
         else {
             match(NOT);
         }
+        recursionDepth--;
     }
 
 

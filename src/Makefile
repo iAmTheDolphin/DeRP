@@ -1,6 +1,6 @@
 JFLAGS = -g
 JC = javac
-JVM = java Scanner
+JVM = java Recognizer
 .SUFFIXES: .java .class
 .java.class:
 	$(JC) $(JFLAGS) $*.java
@@ -9,30 +9,30 @@ CLASSES = \
 	Types.java \
 	Lexeme.java \
 	Lexer.java \
-	Scanner.java \
+	Recognizer.java \
 
-MAIN = Scanner
+MAIN = Recognizer
 
 default: classes
 
 classes: $(CLASSES:.java=.class)
 
-scanner : Scanner.class
-	$(JC) Scanner.java
+recognizer : Recognizer.class
+	$(JC) Recognizer.java
 
-test1 : Scanner.class
+test1 : $(MAIN).class
 	$(JVM) test1.derp
 
-test2: Scanner.class
+test2: $(MAIN).class
 	$(JVM) test2.derp
 
-test3: Scanner.class
+test3: $(MAIN).class
 	$(JVM) test3.derp
 
-test4: Scanner.class
+test4: $(MAIN).class
 	$(JVM) test4.derp
 
-test5: Scanner.class
+test5: $(MAIN).class
 	$(JVM) test5.derp
 
 run : $(MAIN).class

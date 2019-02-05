@@ -1,7 +1,7 @@
 //DERP test1.derp
-//Parker Jones
+// Parker Jones
 
-function test1 (x, y, z) {
+function test1 using (x, y, z) {
 
     if x >= y {
         z = x
@@ -11,6 +11,6 @@ function test1 (x, y, z) {
     }
 }
 
-function main() {
+function main using () {
     test1()
 }

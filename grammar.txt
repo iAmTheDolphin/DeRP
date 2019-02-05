@@ -11,11 +11,12 @@ var_expr
     | ID OPAREN opt_param_list CPAREN
     | ID OBRACKET UNARY CBRACKET
 
-2: operator
+operator
 	: PLUS
 	| MINUS
 	| TIMES
 	| DIVIDES
+	| ASSIGN
 
 expression
     : unary_expr
@@ -45,26 +46,26 @@ defs
 	: unary
 	| unary COMMA paramList
 
-7: opt_param_list
+opt_param_list
 	: param_list
 	| EMPTY
 
-10: function_def
+function_def
 	: FUNCTION ID USING OPAREN opt_param_list CPAREN
 
-11: body
+body
 	: OBRACE opt_expr_list CBRACE
 
-12: array_def
+array_def
 	: LIST unary OBRACKET UNARY CBRACKET
 
-14: var_def
+var_def
 	: VAR ID EQUALS unary
 
-15: var_assign
+var_assign
 	: ID EQUALS unary
 
-17: comp
+comp
 	: GREATER
 	| LESS
 	| GREATEREQUAL
@@ -74,11 +75,11 @@ defs
 loop :
 	| while
 
-18: while
+while
 	: LOOP WHILE condition_list body
 	| LOOP WHILE condition_list expression
 
-19: if
+if
 	: IF condition_list expression opt_otherwise
 	| IF condition_list body opt_otherwise
 
@@ -95,17 +96,20 @@ linker
 	| OR
 	| NOT
 
-22: condition_list
-	: expression comp expression
-	| expression comp expression linker condition_list
+condition_list
+	: expression
+	| expression linker condition_list
 
-23: return
+condition
+    : expression comp expression
+
+return
 	: RETURN expression
 
-24: array_assign
+array_assign
 	: UNARY OBRACKET UNARY CBRACKET EQUALS expression
 
-25: rement
+rement
 	: INCREMENT unary
 	| DECREMENT unary
 
