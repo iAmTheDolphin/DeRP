@@ -7,17 +7,6 @@ import java.nio.channels.FileLockInterruptionException;
 
 public class Scanner implements Types{
 
-    public static int lineNumber = 1;
+    public static int lineNumber = 0;
 
-
-    Lexer lex ;
-
-    Scanner (File file) {
-
-    }
-
-    public Lexeme getNexLex() {
-        Lexeme token = lex.lex();
-        return token;
-    }
 }

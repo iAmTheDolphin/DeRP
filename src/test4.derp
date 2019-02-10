@@ -1,30 +1,25 @@
-function sum(x, y) {
+function sum using (x, y) {
 
     return x + y
 
 }
 
-function fib() {
+function fib using () {
 
-    array prev[100]
-
-    array[0] = 1
-    array[1] = sum(array[0], 1)
-
-    variable x = 2;
+    list prev[100]
 
     loop while x < 100 {
-        array[x] = sum(array[x-1], array[x-2])
+        prev[x] = sum(prev[2], prev[1])
         x++
     }
 
     loop while x > 0 {
-        print(array[x])
+        print(prev[x])
         x--
     }
 
 }
 
-function main() {
+function main using () {
     fib()
 }

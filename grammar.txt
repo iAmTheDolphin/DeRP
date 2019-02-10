@@ -43,8 +43,8 @@ defs
 	| var_def
 
  param_list
-	: unary
-	| unary COMMA paramList
+	: expression
+	| expression COMMA paramList
 
 opt_param_list
 	: param_list
@@ -55,6 +55,11 @@ function_def
 
 body
 	: OBRACE opt_expr_list CBRACE
+	| OBRACE defs
+
+exprAndDefs
+    : opt_expr_list exprAndDefs
+    | defs
 
 array_def
 	: LIST unary OBRACKET UNARY CBRACKET

@@ -36,11 +36,12 @@ public interface Types {
     String BAD_NUMBER= "BAD_NUMBER";
     String ARRAY= "ARRAY";
     String LIST= "LIST";
-    String VAR= "VAR";
+    String VARIABLE= "VARIABLE";
     String IF= "IF";
     String WHILE= "WHILE";
     String LOOP= "LOOP";
     String OTHERWISE= "OTHERWISE";
     String AND= "AND";
     String OR= "OR";
+    String RETURN= "RETURN";
 }

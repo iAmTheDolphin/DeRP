@@ -1,4 +1,4 @@
-function main() {
+function main using () {
 
     variable bottles = 99
 

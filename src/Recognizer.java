@@ -107,18 +107,34 @@ public class Recognizer implements Types{
     }
 
     private static boolean varDefPending() {
-        return check(VAR);
+        return check(VARIABLE);
     }
 
     private static void varDef() {
         recursionDepth++;
         if(debug) System.out.println("DEBUG: var def " + recursionDepth);
 
-        match(VAR);
+        match(VARIABLE);
         match(ID);
-        match(EQUALS);
+        match(ASSIGN);
         unary();
         recursionDepth--;
+    }
+
+    private static boolean exprAndDefsPending() {
+        if(defsPending() || exprListPending()) {
+            return true;
+        }
+        else return false;
+    }
+
+    private static void exprAndDefs() {
+        if(defsPending()) {
+            defs();
+        }
+        else if(exprListPending()) {
+            exprList();
+        }
     }
 
     private static void functionDef () {
@@ -142,20 +158,20 @@ public class Recognizer implements Types{
         return check(FUNCTION);
     }
 
+    private static boolean paramListPending() {
+        return (check(COMMA) || expressionPending());
+    }
+
     private static void paramList() {
         recursionDepth++;
         if(debug) System.out.println("DEBUG: param list " + recursionDepth);
 
-        unary();
+        expression();
         if(paramListPending()) {
             match(COMMA);
             paramList();
         }
         recursionDepth--;
-    }
-
-    private static boolean paramListPending() {
-        return check(COMMA);
     }
 
     private static void unary() {
@@ -203,7 +219,9 @@ public class Recognizer implements Types{
         match(ID);
         if(check(OPAREN)) {
             match(OPAREN);
-            if(paramListPending()) paramList();
+            if(paramListPending()) {
+                paramList();
+            }
             match(CPAREN);
         }
         else if(check(OBRACKET)) {
@@ -223,7 +241,7 @@ public class Recognizer implements Types{
         if(debug) System.out.println("DEBUG: body " + recursionDepth);
 
         match(OBRACE);
-        if(exprListPending())exprList();
+        while(exprAndDefsPending()) exprAndDefs();
         match(CBRACE);
         recursionDepth--;
     }
@@ -243,7 +261,7 @@ public class Recognizer implements Types{
     }
 
     private static boolean expressionPending() {
-        if( ifdefPending() || loopPending() || unaryExprPending()) {
+        if( ifdefPending() || loopPending() || unaryExprPending() || check(RETURN)) {
             return true;
         }
         else return false;
@@ -258,6 +276,10 @@ public class Recognizer implements Types{
         }
         else if (ifdefPending() ) {
             ifdef();
+        }
+        else if (check(RETURN)) {
+            match(RETURN);
+            expression();
         }
         else{ //unary expressions
             unaryExpr();
@@ -274,16 +296,31 @@ public class Recognizer implements Types{
         if(debug) System.out.println("DEBUG: unary expr " + recursionDepth);
 
         unary();
-        if(operatorPending()) {
-            operator();
+        if(!rementPending()) {
+            if (operatorPending()) {
+                operator();
+            } else if (compPending()) {
+                comp();
+            }
+            unary();
         }
-        else if (compPending()){
-            comp();
+        else {
+            rement();
         }
-        unary();
         recursionDepth--;
     }
 
+    public static boolean rementPending() {
+        if(check(DECREMENT) || check(INCREMENT)) {
+            return true;
+        }
+        else return false;
+    }
+
+    private static void rement() {
+        if(check(DECREMENT)) match(DECREMENT);
+        else match(INCREMENT);
+    }
 
 
     private static boolean operatorPending() {

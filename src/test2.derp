@@ -1,11 +1,11 @@
 
 function thisfunction using () {
 
-    function interiorFunction(x) {
+    function interiorFunction using (x) {
         print(x + " this is printing from interior function")
     }
 
-    variable x = 1;
+    variable x = 1
 
     interiorFunction(x)
     interiorFunction(x + 1)
