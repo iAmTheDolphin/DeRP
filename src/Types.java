@@ -44,4 +44,7 @@ public interface Types {
     String AND= "AND";
     String OR= "OR";
     String RETURN= "RETURN";
+    String ENV= "ENV";
+    String TABLE= "TABLE";
+    String JOIN= "JOIN";
 }
