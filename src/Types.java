@@ -8,12 +8,14 @@ public interface Types {
     String CBRACE= "CBRACE";
     String OBRACKET= "OBRACKET";
     String CBRACKET= "CBRACKET";
+
     String PLUS= "PLUS";
     String INCREMENT= "INCREMENT";
     String TIMES = "TIMES";
     String MINUS= "MINUS";
     String DECREMENT= "DECREMENT";
     String DIVIDES= "DIVIDES";
+
     String COMMA= "COMMA";
     String LESSTHAN= "LESSTHAN";
     String LESSTHANEQUAL= "LESSTHANEQUAL";
@@ -61,4 +63,6 @@ public interface Types {
     String OPERATION= "OPERATION";
     String DEF= "DEF";
     String ARG= "ARG";
+    String FUNKGLUE= "FUNKGLUE";
+    String IFGLUE= "IFGLUE";
 }

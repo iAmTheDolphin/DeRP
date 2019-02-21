@@ -24,7 +24,9 @@ public class Recognizer implements Types{
         advance();
         Lexeme prog = program();
 
-        inOrder(prog);
+        //inOrder(prog);
+
+        prettyPrint(prog);
 
         System.out.println("LEGAL");
     }
@@ -58,7 +60,6 @@ public class Recognizer implements Types{
         return prev;
     }
 
-
     private static boolean check(String type) {
         return current.type.equals(type);
     }
@@ -88,7 +89,6 @@ public class Recognizer implements Types{
         return prog;
     }
 
-
     private static boolean programPending() {
         return defsPending();
     }
@@ -97,7 +97,6 @@ public class Recognizer implements Types{
         if(functionDefPending() || arrayDefPending() || varDefPending()) return true;
         else return false;
     }
-
 
     private static Lexeme defs() {
         recursionDepth++;
@@ -119,11 +118,9 @@ public class Recognizer implements Types{
         return def;
     }
 
-
     private static boolean arrayDefPending() {
         return check(ARRAY);
     }
-
 
     private static Lexeme arrayDef() {
         Lexeme arrDef = new Lexeme(ARRAYDEF);
@@ -142,11 +139,9 @@ public class Recognizer implements Types{
 
     }
 
-
     private static boolean varDefPending() {
         return check(VARIABLE);
     }
-
 
     private static Lexeme varDef() {
         recursionDepth++;
@@ -160,15 +155,13 @@ public class Recognizer implements Types{
         return var;
     }
 
-
     private static boolean exprAndDefsPending() {
         return (defsPending() || exprListPending());
     }
 
-
     private static Lexeme exprAndDefs() {
         if(debug) System.out.println("DEBUG: exprAndDefs " + recursionDepth);
-        Lexeme l = new Lexeme();
+        Lexeme l = null;
         if(defsPending()) {
             l = defs();
         }
@@ -178,7 +171,6 @@ public class Recognizer implements Types{
         return l;
     }
 
-
     private static Lexeme functionDef () {
         recursionDepth++;
         if(debug) System.out.println("DEBUG: function def " + recursionDepth);
@@ -187,17 +179,16 @@ public class Recognizer implements Types{
         func.left = match(ID);
         match(USING);
         match(OPAREN);
-        Lexeme glue = func.right = new Lexeme(GLUE);
+        Lexeme fglue = func.right = new Lexeme(FUNKGLUE);
         if(!check(CPAREN)) {
-            glue.right = argList();
+            fglue.right = argList();
         }
         match(CPAREN);
-        glue.left = body();
+        fglue.left = body();
         recursionDepth--;
 
         return func;
     }
-
 
     private static boolean functionDefPending() {
         return check(FUNCTION);
@@ -230,7 +221,6 @@ public class Recognizer implements Types{
     private static boolean paramListPending() {
         return (check(COMMA) || expressionPending());
     }
-
 
     private static Lexeme paramList() {
         recursionDepth++;
@@ -292,25 +282,30 @@ public class Recognizer implements Types{
         return check(ID);
     }
 
+    private static Lexeme functionCall() {
+        Lexeme params = new Lexeme(PARAMLIST);
+        match(OPAREN);
+        if(paramListPending()) {
+            params = paramList();
+        }
+        match(CPAREN);
+        return params;
+    }
+
     private static Lexeme varExpr() {
         recursionDepth++;
         if(debug) System.out.println("DEBUG: var expr " + recursionDepth);
 
-        Lexeme varEx = new Lexeme();
-
-        match(ID);
+        Lexeme varEx = new Lexeme(VAREXPR);
+        varEx.left = match(ID);
         if(check(OPAREN)) { // function call
-            match(OPAREN);
             varEx.type = FUNCTIONCALL;
-            if(paramListPending()) {
-                varEx.left = paramList();
-            }
-            match(CPAREN);
+            varEx.right = functionCall();
         }
         else if(check(OBRACKET)) { // array call
             varEx.type = ARRAYCALL;
             match(OBRACKET);
-            varEx.left = unary();
+            varEx.right = unary();
             match(CBRACKET);
         }
         recursionDepth--;
@@ -389,7 +384,7 @@ public class Recognizer implements Types{
         if(debug) System.out.println("DEBUG: unary expr " + recursionDepth);
 
         Lexeme op = new Lexeme();
-        op.right = unary();
+        op.left = unary();
         if(!rementPending()) {
             if (operatorPending()) {
                 op.type = operator().type;
@@ -399,7 +394,9 @@ public class Recognizer implements Types{
             op.right = unary();
         }
         else {
-            op.right = rement();
+            Lexeme temp = op;
+            op = rement();
+            op.left = temp;
         }
         recursionDepth--;
         return op;
@@ -414,7 +411,6 @@ public class Recognizer implements Types{
         else return match(INCREMENT);
     }
 
-
     private static boolean operatorPending() {
         return (check(PLUS) || check(MINUS) || check(TIMES) || check(DIVIDES) || check(ASSIGN));
     }
@@ -428,7 +424,6 @@ public class Recognizer implements Types{
         else if(check(TIMES)) return match(TIMES);
         else if(check(DIVIDES))return match(DIVIDES);
         else return match(ASSIGN);
-
     }
 
     private static boolean compPending() {
@@ -457,7 +452,7 @@ public class Recognizer implements Types{
         if(debug) System.out.println("DEBUG: ifdef " + recursionDepth);
         Lexeme ifdec = match(IF);
         ifdec.left = conditionList();
-        Lexeme glue = ifdec.right = new Lexeme(GLUE);
+        Lexeme glue = ifdec.right = new Lexeme(IFGLUE);
         if(bodyPending()) glue.left = body();
         else glue.left = expression();
         if(otherwisePending()) glue.right = otherwise();
@@ -508,6 +503,7 @@ public class Recognizer implements Types{
 
         return other;
     }
+
     //FIXME assign doesnt have ids in the parse tree
     private static Lexeme conditionList() {
         recursionDepth++;
@@ -547,5 +543,112 @@ public class Recognizer implements Types{
     }
 
 
+    public static void prettyPrint(Lexeme tree) {
+        switch (tree.type) {
+            case INT:{ System.out.print(tree.intVal); break;}
+            case REAL:{ System.out.print(tree.realVal); break;}
+            case STRING: { System.out.print(" \"" + tree.strVal + "\" ");  break;}
+            case PLUS : {
+                prettyPrint(tree.left);
+                System.out.print(" + ");
+                prettyPrint(tree.right);
+                break;
+            }
+            case TIMES : {
+                prettyPrint(tree.left);
+                System.out.print(" * ");
+                prettyPrint(tree.right);
+                break;
+            }
+            case MINUS : {
+                prettyPrint(tree.left);
+                System.out.print(" - ");
+                prettyPrint(tree.right);
+                break;
+            }
+            case DIVIDES : {
+                prettyPrint(tree.left);
+                System.out.print(" / ");
+                prettyPrint(tree.right);
+                break;
+            }
+            case INCREMENT : {
+                prettyPrint(tree.left);
+                System.out.print("++");
+                break;
+            }
+            case DECREMENT : {
+                prettyPrint(tree.left);
+                System.out.print("--");
+                break;
+            }
+            case DEF : {
+                if(tree.left != null) prettyPrint(tree.left);
+                if(tree.right != null ) prettyPrint(tree.right);
+                break;
+            }
+            //FIXME Come back here later after funkglue is applied to the block and args
+            case FUNCTION : {
+                System.out.print(" function ");
+                prettyPrint(tree.left);
+                System.out.print(" using (");
+                prettyPrint(tree.right);
+                break;
+            }
+            case GLUE : {
+                prettyPrint(tree.left);
+                if(tree.right != null) prettyPrint(tree.right);
+                break;
+            }
+            case ID : {
+                System.out.print(tree.strVal );
+                break;
+            }
+            case BODY : {
+                System.out.print(" { ");
+                if (tree.right != null) prettyPrint(tree.right);
+                System.out.print(" } ");
+                break;
+            }
+            case IF : {
+                System.out.print(" if ");
+                prettyPrint(tree.left);
+                prettyPrint(tree.right);
+                break;
+            }
+            case ARG : {
+                prettyPrint(tree.left);
+                if(tree.right != null) {
+                    System.out.print(", ");
+                    prettyPrint(tree.right);
+                }
+                break;
+            }
+            case FUNKGLUE : {
+                if (tree.right != null) {
+                    prettyPrint(tree.right);
+                }
+                System.out.print(" ) ");
+                prettyPrint(tree.left);
+                break;
+            }
+            case CONDITIONLIST : {
+                prettyPrint(tree.left);
+                prettyPrint(tree.right);
+                break;
+            }
+            case GREATERTHANEQUAL : {
+                prettyPrint(tree.left);
+                System.out.print(" >= ");
+                prettyPrint(tree.right);
+                break;
+            }
+            case VAREXPR : {
+                prettyPrint(tree.left);
+                break;
+            }
+            default: System.out.println("UNDEFINED TYPE: " + tree.type);
+        }
+    }
 
 }
