@@ -19,13 +19,33 @@ public class Recognizer implements Types{
 
 
     public static void main(String[] args) {
-
         file = new File(args[0]);
-
         lex = new Lexer(file);
         advance();
-        program();
+        Lexeme prog = program();
+
+        inOrder(prog);
+
         System.out.println("LEGAL");
+    }
+
+    public static void inOrder(Lexeme current) {
+        if(current.left != null) {
+            inOrder(current.left);
+        }
+
+        System.out.println(current.type);
+
+        if(current.right != null) {
+            inOrder(current.right);
+        }
+    }
+
+    private static Lexeme cons(String type, Lexeme left, Lexeme right) {
+        Lexeme lex = new Lexeme(type);
+        lex.left = left;
+        lex.right = right;
+        return lex;
     }
 
     private static Lexeme advance() {
@@ -37,6 +57,7 @@ public class Recognizer implements Types{
         }
         return prev;
     }
+
 
     private static boolean check(String type) {
         return current.type.equals(type);
@@ -55,15 +76,18 @@ public class Recognizer implements Types{
         }
     }
 
-    private static void program() {
+    private static Lexeme program() {
         recursionDepth++;
         if(debug) System.out.println("DEBUG: program");
-        defs();
+        Lexeme prog = defs();
         if (programPending()) {
-            program();
+            prog.right = program();
         }
         recursionDepth--;
+
+        return prog;
     }
+
 
     private static boolean programPending() {
         return defsPending();
@@ -74,132 +98,188 @@ public class Recognizer implements Types{
         else return false;
     }
 
-    private static void defs() {
+
+    private static Lexeme defs() {
         recursionDepth++;
         if(debug) System.out.println("DEBUG: defs " + recursionDepth);
-
+        Lexeme def = new Lexeme("DEF");
         if(functionDefPending()) {
-            functionDef();
+            def.type = DEF;
+            def.left = functionDef();
         }
         else if(arrayDefPending()) {
-            arrayDef();
+            def.type = DEF;
+            def.left = arrayDef();
         }
-        else {
-            varDef();
+        else if(varDefPending()) {
+            def.type = DEF;
+            def.left = varDef();
         }
         recursionDepth --;
+        return def;
     }
+
 
     private static boolean arrayDefPending() {
         return check(ARRAY);
     }
 
-    private static void arrayDef() {
+
+    private static Lexeme arrayDef() {
+        Lexeme arrDef = new Lexeme(ARRAYDEF);
+
         recursionDepth++;
         if(debug) System.out.println("DEBUG: array def " + recursionDepth);
 
         match(LIST);
-        unary();
+        arrDef.left = unary();
         match(OBRACKET);
-        unary();
+        arrDef.right = unary();
         match(CBRACKET);
+
         recursionDepth--;
+        return (arrDef);
+
     }
+
 
     private static boolean varDefPending() {
         return check(VARIABLE);
     }
 
-    private static void varDef() {
+
+    private static Lexeme varDef() {
         recursionDepth++;
         if(debug) System.out.println("DEBUG: var def " + recursionDepth);
-
+        Lexeme var = new Lexeme(VARDEF);
         match(VARIABLE);
-        match(ID);
+        var.left = match(ID);
         match(ASSIGN);
-        unary();
+        var.right = unary();
         recursionDepth--;
+        return var;
     }
+
 
     private static boolean exprAndDefsPending() {
-        if(defsPending() || exprListPending()) {
-            return true;
-        }
-        else return false;
+        return (defsPending() || exprListPending());
     }
 
-    private static void exprAndDefs() {
+
+    private static Lexeme exprAndDefs() {
+        if(debug) System.out.println("DEBUG: exprAndDefs " + recursionDepth);
+        Lexeme l = new Lexeme();
         if(defsPending()) {
-            defs();
+            l = defs();
         }
-        else if(exprListPending()) {
-            exprList();
+        else if(expressionPending()) {
+            l = expression();
         }
+        return l;
     }
 
-    private static void functionDef () {
+
+    private static Lexeme functionDef () {
         recursionDepth++;
         if(debug) System.out.println("DEBUG: function def " + recursionDepth);
 
-        match(FUNCTION);
-        match(ID);
+        Lexeme func = match(FUNCTION);
+        func.left = match(ID);
         match(USING);
         match(OPAREN);
+        Lexeme glue = func.right = new Lexeme(GLUE);
         if(!check(CPAREN)) {
-            paramList();
+            glue.right = argList();
         }
         match(CPAREN);
-        body();
+        glue.left = body();
         recursionDepth--;
+
+        return func;
     }
 
-    //fixme this might not work.
+
     private static boolean functionDefPending() {
         return check(FUNCTION);
     }
+
+    private static Lexeme argList() {
+        recursionDepth++;
+        Lexeme arg = null;
+        if (argPending()) {
+            arg = new Lexeme(ARG);
+            arg.left = match(ID);
+            if(commaPending()) {
+                match(COMMA);
+                arg.right = argList();
+            }
+        }
+        recursionDepth--;
+        return arg;
+    }
+
+    private static boolean commaPending() {
+        return check(COMMA);
+    }
+
+    private static boolean argPending() {
+        return check(ID);
+    }
+
 
     private static boolean paramListPending() {
         return (check(COMMA) || expressionPending());
     }
 
-    private static void paramList() {
+
+    private static Lexeme paramList() {
         recursionDepth++;
         if(debug) System.out.println("DEBUG: param list " + recursionDepth);
-
-        expression();
+        Lexeme list = new Lexeme(PARAMLIST);
+        list.left = expression();
         if(paramListPending()) {
             match(COMMA);
-            paramList();
+            list.right = paramList();
         }
         recursionDepth--;
+        return list;
     }
 
-    private static void unary() {
+    private static Lexeme unary() {
         recursionDepth++;
         if(debug) System.out.println("DEBUG: unary " + recursionDepth);
 
+        Lexeme l = new Lexeme();
+
         if(check(INT)){
-            match(INT);
+            l.type = INT;
+            l.left = match(INT);
         }
         else if(check(REAL)) {
-            match(REAL);
+            l.type = REAL;
+            l.left = match(REAL);
         }
         else if(check(STRING)) {
-            match(STRING);
+            l.type = STRING;
+            l.left = match(STRING);
         }
         else if(check(OPAREN)) {
+            //FIXME this might have precident problems
             match(OPAREN);
-            expression();
+            l = expression();
             match(CPAREN);
         }
         else if (varExprPending()) {
-            varExpr();
+            l = varExpr();
         }
         else if(check(NOT)){
-            match(NOT);
-            unary();
+            l.type = NOTEXPR;
+            l.right = match(NOT);
+            l.left = unary();
         }
         recursionDepth--;
+
+        return (l);
     }
 
     private static boolean unaryPending() {
@@ -212,38 +292,51 @@ public class Recognizer implements Types{
         return check(ID);
     }
 
-    private static void varExpr() {
+    private static Lexeme varExpr() {
         recursionDepth++;
         if(debug) System.out.println("DEBUG: var expr " + recursionDepth);
 
+        Lexeme varEx = new Lexeme();
+
         match(ID);
-        if(check(OPAREN)) {
+        if(check(OPAREN)) { // function call
             match(OPAREN);
+            varEx.type = FUNCTIONCALL;
             if(paramListPending()) {
-                paramList();
+                varEx.left = paramList();
             }
             match(CPAREN);
         }
-        else if(check(OBRACKET)) {
+        else if(check(OBRACKET)) { // array call
+            varEx.type = ARRAYCALL;
             match(OBRACKET);
-            unary();
+            varEx.left = unary();
             match(CBRACKET);
         }
         recursionDepth--;
+        return varEx;
     }
 
     private static boolean bodyPending() {
         return check(OBRACE);
     }
 
-    private static void body() {
+    private static Lexeme body() {
+        Lexeme block = new Lexeme(BODY);
         recursionDepth++;
         if(debug) System.out.println("DEBUG: body " + recursionDepth);
 
         match(OBRACE);
-        while(exprAndDefsPending()) exprAndDefs();
+        Lexeme parent = block;
+        while(exprAndDefsPending()) {
+            Lexeme glue = new Lexeme(GLUE);
+            parent.right = glue;
+            glue.left = exprAndDefs();
+            parent = glue;
+        }
         match(CBRACE);
         recursionDepth--;
+        return block;
     }
 
     private static boolean exprListPending() {
@@ -261,194 +354,196 @@ public class Recognizer implements Types{
     }
 
     private static boolean expressionPending() {
-        if( ifdefPending() || loopPending() || unaryExprPending() || check(RETURN)) {
-            return true;
-        }
-        else return false;
+        return ( ifdefPending() || loopPending() || unaryExprPending() || check(RETURN));
     }
 
-    private static void expression() {
+    private static Lexeme expression() {
         recursionDepth++;
         if(debug) System.out.println("DEBUG: expression " + recursionDepth);
-
+        Lexeme l = new Lexeme();
         if(loopPending()) {
-            loop();
+            l.type = LOOP;
+            l.left = loop();
         }
         else if (ifdefPending() ) {
-            ifdef();
+            l = ifdef();
         }
         else if (check(RETURN)) {
             match(RETURN);
-            expression();
+            l.type = RETURN;
+            l.left = expression();
         }
         else{ //unary expressions
-            unaryExpr();
+            l = unaryExpr();
         }
         recursionDepth--;
+        return l;
     }
 
     private static boolean unaryExprPending() {
         return unaryPending();
     }
 
-    private static void unaryExpr() {
+    private static Lexeme unaryExpr() {
         recursionDepth++;
         if(debug) System.out.println("DEBUG: unary expr " + recursionDepth);
 
-        unary();
+        Lexeme op = new Lexeme();
+        op.right = unary();
         if(!rementPending()) {
             if (operatorPending()) {
-                operator();
+                op.type = operator().type;
             } else if (compPending()) {
-                comp();
+                op.type = comp().type;
             }
-            unary();
+            op.right = unary();
         }
         else {
-            rement();
+            op.right = rement();
         }
         recursionDepth--;
+        return op;
     }
 
-    public static boolean rementPending() {
-        if(check(DECREMENT) || check(INCREMENT)) {
-            return true;
-        }
-        else return false;
+    private static boolean rementPending() {
+        return(check(DECREMENT) || check(INCREMENT));
     }
 
-    private static void rement() {
-        if(check(DECREMENT)) match(DECREMENT);
-        else match(INCREMENT);
+    private static Lexeme rement() {
+        if(check(DECREMENT)) return match(DECREMENT);
+        else return match(INCREMENT);
     }
 
 
     private static boolean operatorPending() {
-        if(check(PLUS) || check(MINUS) || check(TIMES) || check(DIVIDES) || check(ASSIGN)){
-            return true;
-        }
-        else return false;
+        return (check(PLUS) || check(MINUS) || check(TIMES) || check(DIVIDES) || check(ASSIGN));
     }
 
-    private static void operator() {
+    private static Lexeme operator() {
         recursionDepth++;
         if(debug) System.out.println("DEBUG: operator " + recursionDepth);
-
-        if(check(PLUS)) match(PLUS);
-        else if(check(MINUS)) match(MINUS);
-        else if(check(TIMES)) match(TIMES);
-        else if(check(DIVIDES))match(DIVIDES);
-        else match(ASSIGN);
         recursionDepth--;
+        if(check(PLUS)) return match(PLUS);
+        else if(check(MINUS)) return match(MINUS);
+        else if(check(TIMES)) return match(TIMES);
+        else if(check(DIVIDES))return match(DIVIDES);
+        else return match(ASSIGN);
+
     }
 
     private static boolean compPending() {
-        if(check(GREATERTHANEQUAL) || check(LESSTHANEQUAL) || check(LESSTHAN) || check(GREATERTHAN) || check(NOTEQUAL) || check(EQUALS))
-            return true;
-        else return false;
+        return (check(GREATERTHANEQUAL) || check(LESSTHANEQUAL) || check(LESSTHAN) || check(GREATERTHAN) || check(NOTEQUAL) || check(EQUALS));
     }
 
-    private static void comp() {
+    private static Lexeme comp() {
         recursionDepth++;
         if(debug) System.out.println("DEBUG: comp " + recursionDepth);
-
-        if(check(GREATERTHAN)) match(GREATERTHAN);
-        else if(check(LESSTHAN)) match(LESSTHAN);
-        else if(check(GREATERTHANEQUAL)) match(GREATERTHANEQUAL);
-        else if (check(LESSTHANEQUAL))match(LESSTHANEQUAL);
-        else if(check(NOTEQUAL))match(NOTEQUAL);
-        else match(EQUALS);
         recursionDepth--;
+
+        if(check(GREATERTHAN)) return match(GREATERTHAN);
+        else if(check(LESSTHAN)) return match(LESSTHAN);
+        else if(check(GREATERTHANEQUAL)) return match(GREATERTHANEQUAL);
+        else if (check(LESSTHANEQUAL)) return match(LESSTHANEQUAL);
+        else if(check(NOTEQUAL)) return match(NOTEQUAL);
+        else return match(EQUALS);
     }
 
     private static boolean ifdefPending() {
         return check(IF);
     }
 
-    private static void ifdef() {
+    private static Lexeme ifdef() {
         recursionDepth++;
         if(debug) System.out.println("DEBUG: ifdef " + recursionDepth);
-
-        match(IF);
-        conditionList();
-        if(bodyPending()) body();
-        else expression();
-        if(otherwisePending()) otherwise();
+        Lexeme ifdec = match(IF);
+        ifdec.left = conditionList();
+        Lexeme glue = ifdec.right = new Lexeme(GLUE);
+        if(bodyPending()) glue.left = body();
+        else glue.left = expression();
+        if(otherwisePending()) glue.right = otherwise();
         recursionDepth--;
+        return ifdec;
     }
 
     private static boolean loopPending() {
         return check(LOOP);
     }
 
-    private static void loop(){
+    private static Lexeme loop(){
         recursionDepth++;
         if(debug) System.out.println("DEBUG: loop " + recursionDepth);
-
+        Lexeme loop = new Lexeme();
         match(LOOP);
-        whileLoop();
+        loop = whileLoop();
         recursionDepth--;
+
+        return loop;
     }
 
-    private static void whileLoop() {
+    private static Lexeme whileLoop() {
         recursionDepth++;
         if(debug) System.out.println("DEBUG: while loop " + recursionDepth);
-
+        Lexeme loop = new Lexeme(WHILE);
         match(WHILE);
-        conditionList();
-        if(bodyPending()) body();
-        else expression();
+        loop.left = conditionList();
+        if(bodyPending()) loop.right = body();
+        else loop.right = expression();
 
         recursionDepth--;
+
+        return loop;
     }
 
     private static boolean otherwisePending() {
         return check(OTHERWISE);
     }
 
-    private static void otherwise() {
+    private static Lexeme otherwise() {
         recursionDepth++;
         if(debug) System.out.println("DEBUG: otherwise " + recursionDepth);
-
-        match(OTHERWISE);
-        if(expressionPending()) expression();
-        else ifdef();
+        Lexeme other = match(OTHERWISE);
+        if(expressionPending()) other.left = expression();
+        else other.left = body();
         recursionDepth--;
-    }
 
-    private static void conditionList() {
+        return other;
+    }
+    //FIXME assign doesnt have ids in the parse tree
+    private static Lexeme conditionList() {
         recursionDepth++;
         if(debug) System.out.println("DEBUG: condition list " + recursionDepth);
-
-        expression();
+        Lexeme conList = new Lexeme(CONDITIONLIST);
+        conList.left = expression();
         if(linkerPending()) {
-            linker();
-            conditionList();
+            //FIXME this might be a problem
+            Lexeme glue = conList.right = new Lexeme(GLUE);
+            glue.left = linker();
+            glue.right = conditionList();
         }
         recursionDepth--;
+
+        return conList;
     }
 
     private static boolean linkerPending() {
-        if(check(AND) || check(OR) || check(NOT)){
-            return true;
-        }
-        else return false;
+        return (check(AND) || check(OR) || check(NOT));
     }
 
-    private static void linker() {
+    private static Lexeme linker() {
         recursionDepth++;
         if(debug) System.out.println("DEBUG: linker " + recursionDepth);
 
-        if(check(NOT)) {
-            match(NOT);
-        }
-        else if(check(OR)){
-            match(OR);
+        Lexeme link = new Lexeme(LINKER);
+
+        if(check(OR)){
+            link.left = match(OR);
         }
         else {
-            match(NOT);
+            link.left = match(AND);
         }
         recursionDepth--;
+
+        return link;
     }
 
 

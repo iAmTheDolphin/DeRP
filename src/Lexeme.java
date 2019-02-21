@@ -11,7 +11,10 @@ class Lexeme implements Types{
     Lexeme right;
 
     Lexeme() {
-        System.out.println("If you see this, you accidentally did Lexeme() constructor with no arguments. ");
+        this.type = null;
+        this.left = null;
+        this.right = null;
+        this.lineNumber = Scanner.lineNumber;
     }
 
 

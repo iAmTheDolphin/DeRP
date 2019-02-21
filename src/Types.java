@@ -2,7 +2,6 @@
 //Parker Jones
 
 public interface Types {
-
     String OPAREN= "OPAREN";
     String CPAREN= "CPAREN";
     String OBRACE= "OBRACE";
@@ -47,4 +46,19 @@ public interface Types {
     String ENV= "ENV";
     String TABLE= "TABLE";
     String JOIN= "JOIN";
+    String FUNCTIONDEF= "FUNCTION_DEF";
+    String ARRAYDEF= "ARRAY_DEF";
+    String VARDEF= "VARDEF";
+    String GLUE= "GLUE";
+    String VAREXPR= "VAREXPR";
+    String NOTEXPR= "NOTEXPR";
+    String FUNCTIONCALL= "FUNCTIONCALL";
+    String ARRAYCALL= "ARRAYCALL";
+    String PARAMLIST= "PARAMLIST";
+    String CONDITIONLIST= "CONDITIONLIST";
+    String LINKER = "LINKER";
+    String BODY= "BODY";
+    String OPERATION= "OPERATION";
+    String DEF= "DEF";
+    String ARG= "ARG";
 }
