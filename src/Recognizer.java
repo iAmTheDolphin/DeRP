@@ -1,25 +1,17 @@
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.PushbackInputStream;
 
 public class Recognizer implements Types{
 
     private static final boolean debug = false;
     private static int recursionDepth = 0;
 
-    public static int lineNumber = 1;
-
-    private static File file;
-    private static FileInputStream iStream;
-    private static PushbackInputStream pStream;
     private static Lexeme current;
 
     private static Lexer lex;
 
 
     public static void main(String[] args) {
-        file = new File(args[0]);
+        File file = new File(args[0]);
         lex = new Lexer(file);
         advance();
         Lexeme prog = program();
@@ -29,18 +21,6 @@ public class Recognizer implements Types{
         prettyPrint(prog);
 
         System.out.println("\nLEGAL");
-    }
-
-    public static void inOrder(Lexeme current) {
-        if(current.left != null) {
-            inOrder(current.left);
-        }
-
-        System.out.println(current.type);
-
-        if(current.right != null) {
-            inOrder(current.right);
-        }
     }
 
     private static Lexeme advance() {
@@ -95,8 +75,7 @@ public class Recognizer implements Types{
     }
 
     private static boolean defsPending() {
-        if(functionDefPending() || arrayDefPending() || varDefPending()) return true;
-        else return false;
+        return(functionDefPending() || arrayDefPending() || varDefPending());
     }
 
     /*
@@ -344,9 +323,7 @@ public class Recognizer implements Types{
     }
 
     private static boolean unaryPending() {
-        if(check(INT) || check(REAL) || check(STRING) || check(OPAREN) || varExprPending() || check(NOT))
-            return true;
-        else return false;
+        return (check(INT) || check(REAL) || check(STRING) || check(OPAREN) || varExprPending() || check(NOT));
     }
 
     private static boolean varExprPending() {
@@ -426,16 +403,6 @@ public class Recognizer implements Types{
 
     private static boolean exprListPending() {
         return expressionPending();
-    }
-
-    private static void exprList() {
-        recursionDepth++;
-        if(debug) System.out.println("DEBUG: expr list " + recursionDepth);
-
-        expression();
-        if(expressionPending()) exprList();
-
-        recursionDepth--;
     }
 
     private static boolean expressionPending() {
@@ -564,9 +531,8 @@ public class Recognizer implements Types{
     private static Lexeme loop(){
         recursionDepth++;
         if(debug) System.out.println("DEBUG: loop " + recursionDepth);
-        Lexeme loop = new Lexeme();
         match(LOOP);
-        loop = whileLoop();
+        Lexeme loop = whileLoop();
         recursionDepth--;
 
         return loop;
