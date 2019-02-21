@@ -14,3 +14,4 @@ function test1 using (x, y, z) {
 function main using () {
     test1()
 }
+

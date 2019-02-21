@@ -283,12 +283,17 @@ public class Recognizer implements Types{
     }
 
     private static Lexeme functionCall() {
+        recursionDepth++;
+
+        if(debug) System.out.println("DEBUG: function call " + recursionDepth);
         Lexeme params = new Lexeme(PARAMLIST);
         match(OPAREN);
         if(paramListPending()) {
             params = paramList();
         }
         match(CPAREN);
+
+        recursionDepth--;
         return params;
     }
 
@@ -303,6 +308,7 @@ public class Recognizer implements Types{
             varEx.right = functionCall();
         }
         else if(check(OBRACKET)) { // array call
+            if(debug) System.out.println("DEBUG: Array Call ");
             varEx.type = ARRAYCALL;
             match(OBRACKET);
             varEx.right = unary();
@@ -325,8 +331,12 @@ public class Recognizer implements Types{
         Lexeme parent = block;
         while(exprAndDefsPending()) {
             Lexeme glue = new Lexeme(GLUE);
-            parent.right = glue;
             glue.left = exprAndDefs();
+            if(glue.left == null) {
+                break;
+            }
+            parent.right = glue;
+            glue.debug();
             parent = glue;
         }
         match(CBRACE);
@@ -383,21 +393,27 @@ public class Recognizer implements Types{
         recursionDepth++;
         if(debug) System.out.println("DEBUG: unary expr " + recursionDepth);
 
-        Lexeme op = new Lexeme();
-        op.left = unary();
-        if(!rementPending()) {
-            if (operatorPending()) {
-                op.type = operator().type;
-            } else if (compPending()) {
-                op.type = comp().type;
-            }
-            op.right = unary();
-        }
-        else {
+        Lexeme op = unary();
+        if(rementPending()) {
             Lexeme temp = op;
             op = rement();
             op.left = temp;
+            recursionDepth--;
+            return op;
         }
+        else if (operatorPending()) {
+            Lexeme temp = op;
+            op = operator();
+            op.left = temp;
+            op.right = unary();
+        }
+        else if (compPending()) {
+            Lexeme temp = op;
+            op = comp();
+            op.left = temp;
+            op.right = unary();
+        }
+
         recursionDepth--;
         return op;
     }
@@ -634,7 +650,7 @@ public class Recognizer implements Types{
             }
             case CONDITIONLIST : {
                 prettyPrint(tree.left);
-                prettyPrint(tree.right);
+                if(tree.right != null)prettyPrint(tree.right);
                 break;
             }
             case GREATERTHANEQUAL : {
@@ -645,6 +661,43 @@ public class Recognizer implements Types{
             }
             case VAREXPR : {
                 prettyPrint(tree.left);
+                break;
+            }
+            case IFGLUE : {
+                prettyPrint(tree.left);
+                if(tree.right != null) {
+                    //tree.right.debug();
+                    prettyPrint(tree.right);
+                }
+                break;
+            }
+            case ASSIGN : {
+                prettyPrint(tree.left);
+                System.out.print(" = ");
+                prettyPrint(tree.right);
+                break;
+            }
+            case OTHERWISE : {
+                System.out.print(" otherwise ");
+                prettyPrint(tree.left);
+                break;
+            }
+            case EQUALS : {
+                prettyPrint(tree.left);
+                System.out.print(" == ");
+                prettyPrint(tree.right);
+                break;
+            }
+            case FUNCTIONCALL : {
+                prettyPrint(tree.left);
+                prettyPrint(tree.right);
+                break;
+            }
+            case PARAMLIST : {
+                System.out.print("(");
+                if(tree.left != null) prettyPrint(tree.left);
+                if(tree.right != null) prettyPrint(tree.right);
+                System.out.print(")");
                 break;
             }
             default: System.out.println("UNDEFINED TYPE: " + tree.type);

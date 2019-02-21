@@ -74,6 +74,7 @@ class Lexeme implements Types{
     }
 
     public void debug() {
+        System.out.print("DEBUGGING LEXEME : ");
         if (this.type == INT) {
             System.out.println(this.type + " : " + this.intVal);
         }
