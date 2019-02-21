@@ -11,7 +11,7 @@ function test1 using (x, y, z) {
     }
 }
 
-function main using () {
+function main using (x) {
     test1()
 }
 

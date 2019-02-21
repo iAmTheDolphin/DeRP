@@ -60,9 +60,7 @@ public interface Types {
     String CONDITIONLIST= "CONDITIONLIST";
     String LINKER = "LINKER";
     String BODY= "BODY";
-    String OPERATION= "OPERATION";
     String DEF= "DEF";
     String ARG= "ARG";
-    String FUNKGLUE= "FUNKGLUE";
-    String IFGLUE= "IFGLUE";
+    String ARGLIST= "ARGLIST";
 }
