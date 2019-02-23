@@ -742,6 +742,11 @@ public class Recognizer implements Types{
                 System.out.print(" ");
                 break;
             }
+            case RETURN : {
+                System.out.print("return ");
+                prettyPrint(tree.left);
+                break;
+            }
             default: System.out.println("UNDEFINED TYPE: " + tree.type);
         }
     }

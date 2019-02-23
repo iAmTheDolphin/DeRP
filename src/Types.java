@@ -48,7 +48,6 @@ public interface Types {
     String ENV= "ENV";
     String TABLE= "TABLE";
     String JOIN= "JOIN";
-    String FUNCTIONDEF= "FUNCTION_DEF";
     String ARRAYDEF= "ARRAY_DEF";
     String VARDEF= "VARDEF";
     String GLUE= "GLUE";

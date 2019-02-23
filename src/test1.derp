@@ -9,6 +9,7 @@ function test1 using (x, y, z) {
 	otherwise if x == z {
         y = z
     }
+    return z
 }
 
 function main using (x) {
