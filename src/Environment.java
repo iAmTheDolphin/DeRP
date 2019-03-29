@@ -1,11 +1,5 @@
 public class Environment implements Types{
 
-    Lexeme env;
-
-    Environment() {
-        env = cons(ENV, cons(TABLE, null, null), null);
-    }
-
     private static Lexeme cons(String type, Lexeme left, Lexeme right) {
         Lexeme lex = new Lexeme(type);
         lex.left = left;
@@ -13,53 +7,55 @@ public class Environment implements Types{
         return lex;
     }
 
-    private static Lexeme car(Lexeme l) {
-        return l.left;
+
+    /**
+     *                env(n)           initially though...     env(0)
+     *              //      \\                                //    \\
+     *          Table        env(n-1)                     TABLE      null
+     *        //    \\                                   //   \\
+     *    JOIN       JOIN                              null    null
+     *   // \\       //  \\
+     *  id   GLUE   val   JOIN
+     */
+
+    public Lexeme createEnv() {
+        return cons(ENV, cons(TABLE, null, null), null);
     }
 
-    private static void setCar(Lexeme l, Lexeme v) {
-        l.left = v;
+    private void insertEnv(Lexeme env, String id, Lexeme val){
+        Lexeme table = env.left;
+        table.left = cons(JOIN, new Lexeme(ID, id),  table.left);
+        table.right = cons(JOIN, val, table.right);
     }
-
-    private static Lexeme cdr(Lexeme l) {
-        return l.right;
-    }
-
-    private static void setCdr(Lexeme l, Lexeme v) {
-        l.right = v;
-    }
-
-    //TODO implement insertEnv
-//    private void insertEnv(Lexeme env, String id, Lexeme val){
-//        setCar(car(env), cons(ID, car(car(env)));
-//        setcdr(car(env), cons(VAR, val, cdr(car(env))));
-//    }
 
     public static Lexeme getVal(Lexeme env, String id) {
         while(env != null) {
-            Lexeme vars = car(car(env));
-            Lexeme vals = cdr(car(env));
+            Lexeme table = env.left;
+            Lexeme vars = table.left;
+            Lexeme vals = table.right;
             while(vars != null) {
-                if (id.equals(car(vars))) {
-                    return car(vars);
+                if (id.equals(vars.left.strVal)) {
+                    return vals.left;
                 }
-                vars = cdr(vars);
-                vals = cdr(vals);
+                vars = vars.right;
+                vals = vals.right;
             }
-            env = cdr(env);
+            env = env.right;
         }
         System.out.println("ERROR : VARIABLE NOT FOUND SCREEEEEEEE");
         System.exit(1);
         return null;
     }
 
-    private Lexeme insertVar(Lexeme env, Lexeme var, Lexeme val) {
-        Lexeme table = car(env);
-        setCar(table, cons(JOIN, var, car(table)));
-        setCdr(table, cons(JOIN, val, cdr(table)));
+    private Lexeme insertEnv(Lexeme env, Lexeme var, Lexeme val) {
+        Lexeme table = env.left;
+        table.left = cons(JOIN, var,  table.left);
+        table.right = cons(JOIN, val, table.right);
         return val;
     }
 
-
+    public Lexeme extendEnv(Lexeme env) {
+        return cons(ENV, createEnv(), env);
+    }
 
 }

@@ -1,7 +1,7 @@
 //Lexeme.java
 //Parker Jones
 class Lexeme implements Types{
-
+    Environment parentEnv;
     String type;
     int intVal;
     String strVal;

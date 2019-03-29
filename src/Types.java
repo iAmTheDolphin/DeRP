@@ -62,4 +62,5 @@ public interface Types {
     String DEF= "DEF";
     String ARG= "ARG";
     String ARGLIST= "ARGLIST";
+    String VAR= "VAR";
 }
