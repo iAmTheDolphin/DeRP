@@ -87,7 +87,7 @@ public class Parser implements Types{
         if(debug) System.out.println("DEBUG: lambda def " + recursionDepth);
 
         Lexeme func = match(LAMBDA);
-        //func.left = match(ID);
+        func.left = new Lexeme();
         match(USING);
         match(OPAREN);
         Lexeme argglue = func.right = new Lexeme(GLUE);
@@ -102,7 +102,6 @@ public class Parser implements Types{
         match(CPAREN);
         blockglue.left = body();
         recursionDepth--;
-
         return func;
     }
 
@@ -130,7 +129,7 @@ public class Parser implements Types{
             def.left = varDef();
         }
         else if(lambdaDefPending()) {
-            def.type = LAMBDA;
+            def.type = DEF;
             def.left = lambdaDef();
         }
         recursionDepth --;

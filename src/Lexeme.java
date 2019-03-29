@@ -69,6 +69,7 @@ class Lexeme implements Types{
         }
         else {
             System.out.println(this.type);
+
         }
         //System.out.println(this.type + " on line " + this.lineNumber + " : " + this.intVal + this.realVal + this.strVal);
     }
