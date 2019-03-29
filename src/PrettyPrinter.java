@@ -51,6 +51,11 @@ public class PrettyPrinter implements Types{
                 prettyPrint(tree.right);
                 break;
             }
+            case LAMBDA : {
+                System.out.print(" lambda using ");
+                prettyPrint(tree.right);
+                break;
+            }
             case GLUE : {
                 if(tree.left != null ) prettyPrint(tree.left);
                 if(tree.right != null) prettyPrint(tree.right);

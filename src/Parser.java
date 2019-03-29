@@ -77,8 +77,35 @@ public class Parser implements Types{
     }
 
     private static boolean defsPending() {
-        return(functionDefPending() || arrayDefPending() || varDefPending());
+        return(functionDefPending() || arrayDefPending() || varDefPending() || lambdaDefPending());
     }
+
+    private static boolean lambdaDefPending() {return check(LAMBDA);}
+
+    private static Lexeme lambdaDef() {
+        recursionDepth++;
+        if(debug) System.out.println("DEBUG: lambda def " + recursionDepth);
+
+        Lexeme func = match(LAMBDA);
+        //func.left = match(ID);
+        match(USING);
+        match(OPAREN);
+        Lexeme argglue = func.right = new Lexeme(GLUE);
+        Lexeme blockglue = argglue.right = new Lexeme(GLUE);
+
+        if(!check(CPAREN)) {
+            argglue.left = argList();
+        }
+        else {
+            argglue.left = new Lexeme(ARGLIST);
+        }
+        match(CPAREN);
+        blockglue.left = body();
+        recursionDepth--;
+
+        return func;
+    }
+
 
     /*
      *              defs()
@@ -101,6 +128,10 @@ public class Parser implements Types{
         else if(varDefPending()) {
             def.type = DEF;
             def.left = varDef();
+        }
+        else if(lambdaDefPending()) {
+            def.type = LAMBDA;
+            def.left = lambdaDef();
         }
         recursionDepth --;
         return def;

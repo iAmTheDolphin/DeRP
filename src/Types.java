@@ -63,4 +63,5 @@ public interface Types {
     String ARG= "ARG";
     String ARGLIST= "ARGLIST";
     String VAR= "VAR";
+    String LAMBDA= "LAMBDA";
 }

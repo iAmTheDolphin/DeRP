@@ -17,7 +17,6 @@ public class Environment implements Types{
      *   // \\       //  \\
      *  id   GLUE   val   JOIN
      */
-
     public Lexeme createEnv() {
         return cons(ENV, cons(TABLE, null, null), null);
     }
