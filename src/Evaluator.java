@@ -86,7 +86,7 @@ public class Evaluator implements Types{
                 evalPrint(tree, env);
                 break;
             }
-            case PARAMLIST : {
+            case PARAM : {
                 return evalParamList(tree, env);
             }
             case IF : {
@@ -100,6 +100,9 @@ public class Evaluator implements Types{
             }
             case VAREXPR : {
                 return evalVarExpr(tree, env);
+            }
+            case ARGLIST : {
+                return evalArgList(tree, env);
             }
 
             default: System.out.println("ERROR EVALUATING: UNDEFINED TYPE: " + tree.type);
@@ -258,11 +261,15 @@ public class Evaluator implements Types{
         Lexeme funct = closure.right;
         Lexeme arglist = tree.right;
         Lexeme params = funct.right.left.left;
-        System.out.println("______________marker_________________");
-        funct.right.left.debug();
-        //params.debug();
-        arglist.debug();
-        System.out.println("______________/marker_________________");
+
+        if(params == null && arglist != null )  {
+            System.out.println("ERROR: Attempting to pass args to a function with no parameters");
+            System.exit(1);
+        }
+        if(params != null && arglist == null) {
+            System.out.println("ERROR: Function Requires Args");
+            System.exit(1);
+        }
         Lexeme body = funct.right.right.left;
         Lexeme senv = closure.left;
         Lexeme evaledArgs = eval(arglist, env);
@@ -291,18 +298,16 @@ public class Evaluator implements Types{
         eval(tree.right, env).print();
     }
 
-    //I messed up early on and named my arguments params and it has haunted me
     private static Lexeme evalParamList(Lexeme tree, Lexeme env) {
         if(debug) System.out.println("DEBUG: Eval: evalBody: ");
-        Lexeme arg = tree;
+        Lexeme param = tree;
         Lexeme val = null;
-        arg.debug();
 
-        while(arg != null && arg.left != null){
+        while(param != null && param.left != null){
             Lexeme temp = val;
-            val = eval(arg.left, env);
+            val = eval(param.left, env);
             val.right = temp;
-            arg = arg.right;
+            param = param.right;
         }
         return (val);
     }
@@ -346,6 +351,21 @@ public class Evaluator implements Types{
 
         System.exit(11);
         return null;
+    }
+
+    private static Lexeme evalArgList(Lexeme tree, Lexeme env) {
+        if(debug) System.out.println("DEBUG: Eval: evalArgList: ");
+        Lexeme arg = tree;
+        Lexeme val = null;
+        arg.debug();
+
+        while(arg != null && arg.left != null){
+            Lexeme temp = val;
+            val = eval(arg.left, env);
+            val.right = temp;
+            arg = arg.right;
+        }
+        return (val);
     }
 }
 

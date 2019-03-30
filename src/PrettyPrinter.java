@@ -47,8 +47,9 @@ public class PrettyPrinter implements Types{
             case FUNCTION : {
                 System.out.print("function ");
                 prettyPrint(tree.left);
-                System.out.print("using ");
-                prettyPrint(tree.right);
+                System.out.print("using ( ");
+                if(tree.right.left != null) prettyPrint(tree.right.left);
+                System.out.print(") ");
                 break;
             }
             case LAMBDA : {
@@ -77,12 +78,10 @@ public class PrettyPrinter implements Types{
                 prettyPrint(tree.right);
                 break;
             }
-            case ARG : {
-                prettyPrint(tree.left);
-                if(tree.right != null) {
-                    System.out.print(", ");
-                    prettyPrint(tree.right);
-                }
+            case PARAM : {
+                System.out.print("( ");
+                if(tree.left != null) prettyPrint(tree.left);
+                System.out.print(") ");
                 break;
             }
             case CONDITIONLIST : {
@@ -122,7 +121,7 @@ public class PrettyPrinter implements Types{
                 prettyPrint(tree.right);
                 break;
             }
-            case PARAMLIST : {
+            case ARG : {
                 System.out.print("( ");
                 if(tree.left != null) prettyPrint(tree.left);
                 if(tree.right != null) prettyPrint(tree.right);

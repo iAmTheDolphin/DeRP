@@ -55,12 +55,10 @@ public interface Types {
     String NOTEXPR= "NOTEXPR";
     String FUNCTIONCALL= "FUNCTIONCALL";
     String ARRAYCALL= "ARRAYCALL";
-    String PARAMLIST= "PARAMLIST";
     String CONDITIONLIST= "CONDITIONLIST";
     String LINKER = "LINKER";
     String BODY= "BODY";
     String DEF= "DEF";
-    String ARG= "ARG";
     String ARGLIST= "ARGLIST";
     String VAR= "VAR";
     String LAMBDA= "LAMBDA";
@@ -68,4 +66,7 @@ public interface Types {
     String MAINBOI= "MAINBOI";
     String PRINT= "PRINT";
     String CLOSURE= "CLOSURE";
+    String PARAM= "PARAM";
+    String ARG= "ARG";
+
 }

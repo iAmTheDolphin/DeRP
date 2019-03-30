@@ -57,7 +57,7 @@ public class Parser implements Types{
         mb.left = program();
         mb.right = new Lexeme(FUNCTIONCALL);
         mb.right.left = new Lexeme(ID, "main");
-        mb.right.right = new Lexeme(PARAMLIST);
+        mb.right.right = null; // because we pass no args to main
         return mb;
     }
 
@@ -128,15 +128,10 @@ public class Parser implements Types{
         func.left = null;
         match(USING);
         match(OPAREN);
-        Lexeme argglue = func.right = new Lexeme(GLUE);
-        Lexeme blockglue = argglue.right = new Lexeme(GLUE);
+        Lexeme paramsglue = func.right = new Lexeme(GLUE);
+        Lexeme blockglue = paramsglue.right = new Lexeme(GLUE);
 
-        if(!check(CPAREN)) {
-            argglue.left = argList();
-        }
-        else {
-            argglue.left = new Lexeme(ARGLIST);
-        }
+        paramsglue.left = param();
         match(CPAREN);
         blockglue.left = body();
         recursionDepth--;
@@ -258,7 +253,7 @@ public class Parser implements Types{
     private static Lexeme print() {
         Lexeme p = match(PRINT);
         match(OPAREN);
-        p.right = paramList();
+        p.right = argsList();
         match(CPAREN);
         return p;
     }
@@ -273,7 +268,7 @@ public class Parser implements Types{
      *                     //
      *                  body
      */
-    private static Lexeme   functionDef () {
+    private static Lexeme functionDef () {
         recursionDepth++;
         if(debug) System.out.println("DEBUG: Parser: function def " + recursionDepth);
 
@@ -281,15 +276,11 @@ public class Parser implements Types{
         func.left = match(ID);
         match(USING);
         match(OPAREN);
-        Lexeme argglue = func.right = new Lexeme(GLUE);
-        Lexeme blockglue = argglue.right = new Lexeme(GLUE);
+        Lexeme paramsglue = func.right = new Lexeme(GLUE);
+        Lexeme blockglue = paramsglue.right = new Lexeme(GLUE);
 
-        if(!check(CPAREN)) {
-            argglue.left = argList();
-        }
-        else {
-            argglue.left = new Lexeme(ARGLIST);
-        }
+        paramsglue.left = param();
+
         match(CPAREN);
         blockglue.left = body();
         recursionDepth--;
@@ -302,69 +293,69 @@ public class Parser implements Types{
     }
 
     /*
-     *          argList()
-     *           ARGLIST
+     *          paramsList()
+     *           PARAMSLIST
      *         //
      *      arg
      */
-    private static Lexeme argList() {
-        if(debug) System.out.println("DEBUG: arg list " + recursionDepth);
-
-        recursionDepth++;
-        Lexeme arglist = new Lexeme(ARGLIST);
-        arglist.left = arg();
-
-        recursionDepth--;
-        return arglist;
-    }
+//    private static Lexeme paramsList() {
+//        if(debug) System.out.println("DEBUG: params list " + recursionDepth);
+//
+//        recursionDepth++;
+//        Lexeme paramslist = new Lexeme(PARAMSLIST);
+//        paramslist.left = args();
+//
+//        recursionDepth--;
+//        return paramslist;
+//    }
 
 
     /*
-     *          arrayDef:
-     *             ARG
+     *          param():
+     *           PARAM
      *         //      \\
-     *       ID         ARG
+     *       ID         PARAM
      */
-    private static Lexeme arg() {
-        if(debug) System.out.println("DEBUG: argument " + recursionDepth);
+    private static Lexeme param() {
+        if(debug) System.out.println("DEBUG: parameter " + recursionDepth);
 
-        Lexeme arg = new Lexeme(ARG);
-        if (argPending()) {
-            arg.left = match(ID);
+        Lexeme para = new Lexeme(PARAM);
+        if (paramPending()) {
+            para.left = match(ID);
             if(commaPending()) {
                 match(COMMA);
-                arg.right = arg();
+                para.right = param();
             }
         }
-        return arg;
+        return para;
     }
 
     private static boolean commaPending() {
         return check(COMMA);
     }
 
-    private static boolean argPending() {
+    private static boolean paramPending() {
         return check(ID);
     }
 
-    private static boolean paramListPending() {
+    private static boolean argsPending() {
         return (check(COMMA) || expressionPending());
     }
 
     /*
-     *          paramList()
-     *          PARAMLIST
+     *          argsList()
+     *          ARGLIST
      *         //      \\
-     *  expression     PARAMLIST
+     *  expression     ARGLIST
      */
-    private static Lexeme paramList() {
+    private static Lexeme argsList() {
         recursionDepth++;
-        if(debug) System.out.println("DEBUG: param list " + recursionDepth);
-        Lexeme list = new Lexeme(PARAMLIST);
+        if(debug) System.out.println("DEBUG: args list " + recursionDepth);
+        Lexeme list = new Lexeme(ARG);
         list.left = expression();
-        if(paramListPending()) {
+        if(argsPending()) {
             match(COMMA);
-            list.right = paramList();
+            list.right = argsList();
         }
         recursionDepth--;
         return list;
@@ -423,24 +414,7 @@ public class Parser implements Types{
         return check(ID);
     }
 
-    /*
-     *        functionCall()
-     *       returns PARAMLIST
-     */
-    private static Lexeme functionCall() {
-        recursionDepth++;
 
-        if(debug) System.out.println("DEBUG: function call " + recursionDepth);
-        Lexeme params = new Lexeme(PARAMLIST);
-        match(OPAREN);
-        if(paramListPending()) {
-            params = paramList();
-        }
-        match(CPAREN);
-
-        recursionDepth--;
-        return params;
-    }
 
     /*
      *          varExpr()
@@ -456,7 +430,11 @@ public class Parser implements Types{
         varEx.left = match(ID);
         if(check(OPAREN)) { // function call
             varEx.type = FUNCTIONCALL;
-            varEx.right = functionCall();
+            match(OPAREN);
+            if(argsPending()) {
+                varEx.right = argsList();
+            }
+            match(CPAREN);
         }
         else if(check(OBRACKET)) { // array call
             if(debug) System.out.println("DEBUG: Array Call ");
@@ -467,6 +445,25 @@ public class Parser implements Types{
         }
         recursionDepth--;
         return varEx;
+    }
+
+    /*
+     *        functionCall()
+     *       returns ARGLIST
+     */
+    private static Lexeme getArgList() {
+        recursionDepth++;
+
+        if(debug) System.out.println("DEBUG: function call " + recursionDepth);
+        Lexeme args = new Lexeme(ARGLIST);
+        match(OPAREN);
+        if(argsPending()) {
+            args = argsList();
+        }
+        match(CPAREN);
+
+        recursionDepth--;
+        return args;
     }
 
     private static boolean bodyPending() {
