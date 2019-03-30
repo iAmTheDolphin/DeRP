@@ -38,6 +38,12 @@ arrays : classes
 arraysx : classes
 	java Evaluator arrays.derp
 
+conditionals : classes
+	java Parser conditionals.derp
+
+conditionalsx : classes
+	java Evaluator conditionals.derp
+
 clean:
 	rm -f *.class
 

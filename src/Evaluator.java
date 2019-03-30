@@ -628,7 +628,6 @@ public class Evaluator implements Types{
     }
 
     private static void evalVarDef(Lexeme tree, Lexeme env) {
-        tree.debug();
         Environment.insertEnv(env, tree.left, tree.right);
         //System.exit(25);
     }

@@ -1,0 +1,26 @@
+function extrabits using (i) {
+	if i > 16 {
+		print("hi")
+	}
+	otherwise {
+		print("otherwise")
+	}
+}
+
+function main using () {
+
+	variable z = 10
+	variable x = 15
+	variable p = 120
+
+	if z >= x {
+		print ("this shouldnt print")
+	}
+	otherwise if z < p {
+		extrabits(x)
+	}
+	otherwise {
+		print("noooo")
+	}
+
+}
