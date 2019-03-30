@@ -15,28 +15,29 @@ public class Environment implements Types{
      *              //      \\                                //    \\
      *          Table        env(n-1)                     TABLE      null
      *        //    \\                                   //   \\
-     *    JOIN       JOIN                              null    null
+     *    PARAM       ARG                              PARAM    ARG
      *   // \\       //  \\
-     *  id   GLUE   val   JOIN
+     *  id   PARAM  val   ARG
      */
     public static Lexeme createEnv() {
         return cons(ENV, cons(TABLE, null, null), null);
     }
 
-    public static void insertEnv(Lexeme env, String id, Lexeme val){
-        Lexeme table = env.left;
-        table.left = cons(JOIN, new Lexeme(ID, id),  table.left);
-        table.right = cons(JOIN, val, table.right);
-    }
+//    public static void insertEnv(Lexeme env, String id, Lexeme val){
+//        Lexeme table = env.left;
+//        table.left = cons(JOIN, new Lexeme(ID, id),  table.left);
+//        table.right = cons(JOIN, val, table.right);
+//    }
 
     public static Lexeme getVal(Lexeme env, String id) {
+        Lexeme t = env;
         if(debug) System.out.println("DEBUG: Env: getVal: " + id);
         while(env != null) {
             Lexeme table = env.left;
             Lexeme vars = table.left;
             Lexeme vals = table.right;
             while(vars != null && vars.left != null) {
-                if (id.equals(vars.left.strVal)) {
+                if (id.equals(vars.left.strVal) && vals.left != null) {
                     return vals.left;
                 }
                 vars = vars.right;
@@ -44,6 +45,8 @@ public class Environment implements Types{
             }
             env = env.right;
         }
+        t.left.debug();
+        t.right.left.left.debug();
         System.out.println("ERROR : VARIABLE NOT FOUND SCREEEEEEEE");
         System.exit(1);
         return null;
@@ -52,14 +55,11 @@ public class Environment implements Types{
     public static Lexeme insertEnv(Lexeme env, Lexeme var, Lexeme val) {
         if(debug) System.out.println("DEBUG: Environment: insertEnv: " + var.strVal);
         Lexeme table = env.left;
-        table.left = cons(JOIN, var,  table.left);
-        table.right = cons(JOIN, val, table.right);
+        table.left = cons(PARAM, var,  table.left);
+        table.right = cons(ARG, val, table.right);
         return val;
     }
 
-    public static Lexeme extendEnv(Lexeme env) {
-        return cons(ENV, createEnv(), env);
-    }
 
     public static Lexeme extendEnv(Lexeme senv, Lexeme vars, Lexeme vals) {
         if(debug) System.out.println("DEBUG: Environment: extendEnv: ");

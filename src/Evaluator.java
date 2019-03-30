@@ -15,6 +15,7 @@ public class Evaluator implements Types{
 
 
     public static Lexeme eval(Lexeme tree, Lexeme env) {
+        if(tree == null) return null;
         if(debug) System.out.println("DEBUG: Eval: EVAL: type of lexeme: " + tree.type);
         switch (tree.type) {
             case INT:{
@@ -90,7 +91,8 @@ public class Evaluator implements Types{
                 return evalParamList(tree, env);
             }
             case IF : {
-                return evalIF(tree, env);
+                evalIF(tree, env);
+                break;
             }
             case CONDITIONLIST : {
                 return evalConditionList(tree, env);
@@ -98,11 +100,24 @@ public class Evaluator implements Types{
             case GREATERTHANEQUAL : {
                 return evalGreaterThanEqual(tree, env);
             }
+            case LESSTHAN : {
+                return evalLessThan(tree, env);
+            }
             case VAREXPR : {
                 return evalVarExpr(tree, env);
             }
-            case ARGLIST : {
-                return evalArgList(tree, env);
+            case ARG : {
+                return evalArg(tree, env);
+            }
+            case RETURN : {
+                return evalReturn(tree, env);
+            }
+            case OTHERWISE : {
+                evalOtherwise (tree, env);
+                break;
+            }
+            case EQUALS : {
+                return evalEquals();
             }
 
             default: System.out.println("ERROR EVALUATING: UNDEFINED TYPE: " + tree.type);
@@ -260,7 +275,7 @@ public class Evaluator implements Types{
         Lexeme closure = Environment.getVal(env, fcID.strVal);
         Lexeme funct = closure.right;
         Lexeme arglist = tree.right;
-        Lexeme params = funct.right.left.left;
+        Lexeme params = funct.right.left;
 
         if(params == null && arglist != null )  {
             System.out.println("ERROR: Attempting to pass args to a function with no parameters");
@@ -274,6 +289,7 @@ public class Evaluator implements Types{
         Lexeme senv = closure.left;
         Lexeme evaledArgs = eval(arglist, env);
         Lexeme xenv = Environment.extendEnv(senv, params, evaledArgs);
+        System.out.print("yeet extended envs ");
         //senv.debug();
         //body.debug();
         return eval(body, xenv);
@@ -285,7 +301,11 @@ public class Evaluator implements Types{
         Lexeme cur = tree.right;
         Lexeme result = null;
         while(cur != null) {
-            result = eval(cur.left, env);
+            if(cur.type == RETURN) {
+                result = eval(cur.left, env);
+                return result;
+            }
+            else result=eval(cur.left, env);
             cur = cur.right;
         }
         return result;
@@ -293,9 +313,8 @@ public class Evaluator implements Types{
 
     private static void evalPrint(Lexeme tree, Lexeme env) {
         if(debug) System.out.println("DEBUG: Eval: evalPrint: ");
-        tree.right.debug();
         //eval the args to print then print them
-        eval(tree.right, env).print();
+        eval(tree.right, env).left.print();
     }
 
     private static Lexeme evalParamList(Lexeme tree, Lexeme env) {
@@ -312,56 +331,102 @@ public class Evaluator implements Types{
         return (val);
     }
 
-    private static Lexeme evalIF(Lexeme tree, Lexeme env) {
+    private static void evalIF(Lexeme tree, Lexeme env) {
+        //left is cond list
+        //right left is body or expression
+        //right right left is otherwise
         if(debug) System.out.println("DEBUG: Eval: evalIF: ");
-        tree.debug();
         Lexeme bool = eval(tree.left, env); // evaluate the condition list
-        System.exit(11);
-        return null;
+        if(bool.tf) {
+            eval(tree.right.left, env);
+        }
+        else {
+            if(tree.right.right.left != null) {
+                eval(tree.right.right.left, env);
+            }
+        }
     }
 
     private static Lexeme evalConditionList(Lexeme tree, Lexeme env) {
         if(debug) System.out.println("DEBUG: Eval: evalConditionList: ");
         //need to evaluate left, then maybe there will be a glue to the right if there is a linker
-        tree.debug();
         Lexeme res = eval(tree.left, env);
-        System.exit(11);
-        return null;
+        Lexeme temp ;
+        while (tree.right != null) { //there is glue and we are moving down the tree
+            temp = tree.right.right;
+            if(tree.right.left.left.type == AND) {
+                res.tf = res.tf && eval(tree.right.right, env).tf;
+                tree = tree.right.right;
+            }
+            else if(tree.right.left.left.type == OR) {
+                res.tf = res.tf || eval(tree.right.right, env).tf;
+                tree = tree.right.right;
+            }
+        }
+        return res;
     }
 
     private static Lexeme evalGreaterThanEqual(Lexeme tree, Lexeme env) {
         if(debug) System.out.println("DEBUG: Eval: evalGreaterThanEqual: ");
 
-        tree.debug();
         Lexeme l = eval(tree.left, env);
         Lexeme r = eval(tree.right, env);
-        System.exit(11);
-        return null;
+        Lexeme res = new Lexeme(BOOL);
+        if(l.type == INT && r.type == INT) res.tf = l.intVal >= r.intVal;
+        else if (l.type == INT && r.type == REAL) res.tf = l.intVal >= r.realVal;
+        else if (l.type == REAL && r.type == INT) res.tf = l.realVal >= r.intVal;
+        else if (l.type == REAL && r.type == REAL) res.tf = l.realVal >= r.realVal;
+        else {
+            System.out.println("ERROR: INCOMPATABLE TYPE WITH >=. MUST BE AN INT OR REAL");
+            System.exit(1);
+        }
+        return res;
+    }
+
+    private static Lexeme evalLessThan(Lexeme tree, Lexeme env) {
+        if(debug) System.out.println("DEBUG: Eval: LessThan: ");
+
+        Lexeme l = eval(tree.left, env);
+        Lexeme r = eval(tree.right, env);
+        Lexeme res = new Lexeme(BOOL);
+        if(l.type == INT && r.type == INT) res.tf = l.intVal < r.intVal;
+        else if (l.type == INT && r.type == REAL) res.tf = l.intVal < r.realVal;
+        else if (l.type == REAL && r.type == INT) res.tf = l.realVal < r.intVal;
+        else if (l.type == REAL && r.type == REAL) res.tf = l.realVal < r.realVal;
+        else {
+            System.out.println("ERROR: INCOMPATABLE TYPE WITH <. MUST BE AN INT OR REAL");
+            System.exit(1);
+        }
+        return res;
     }
 
     private static Lexeme evalVarExpr(Lexeme tree, Lexeme env) {
         if(debug) System.out.println("DEBUG: Eval: evalVarExpr: ");
-
-        env.left.debug();
-        env.left.left.debug();
-        env.left.left.left.debug();
-
         Lexeme var = tree.left;
         Lexeme val = Environment.getVal(env, var.strVal);
-
-        System.exit(11);
-        return null;
+        return val;
     }
 
-    private static Lexeme evalArgList(Lexeme tree, Lexeme env) {
-        if(debug) System.out.println("DEBUG: Eval: evalArgList: ");
+    private static Lexeme evalReturn(Lexeme tree, Lexeme env) {
+        Lexeme res = eval(tree.left, env);
+
+        return res;
+    }
+
+    private static void evalOtherwise(Lexeme tree, Lexeme env) {
+        eval(tree.left, env);
+    }
+
+    //FIXME all the ARGS are coming up as the last arg
+    private static Lexeme evalArg(Lexeme tree, Lexeme env) {
+        if(debug) System.out.println("DEBUG: Eval: evalArg: ");
         Lexeme arg = tree;
-        Lexeme val = null;
+        Lexeme val = new Lexeme(ARG);
         arg.debug();
 
         while(arg != null && arg.left != null){
             Lexeme temp = val;
-            val = eval(arg.left, env);
+            val.left = eval(arg.left, env);
             val.right = temp;
             arg = arg.right;
         }

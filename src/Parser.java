@@ -57,7 +57,7 @@ public class Parser implements Types{
         mb.left = program();
         mb.right = new Lexeme(FUNCTIONCALL);
         mb.right.left = new Lexeme(ID, "main");
-        mb.right.right = null; // because we pass no args to main
+        mb.right.right = new Lexeme(ARG); // because we pass no args to main
         return mb;
     }
 
@@ -448,13 +448,13 @@ public class Parser implements Types{
     }
 
     /*
-     *        functionCall()
+     *        getArgList()
      *       returns ARGLIST
      */
     private static Lexeme getArgList() {
         recursionDepth++;
 
-        if(debug) System.out.println("DEBUG: function call " + recursionDepth);
+        if(debug) System.out.println("DEBUG: getArgList " + recursionDepth);
         Lexeme args = new Lexeme(ARGLIST);
         match(OPAREN);
         if(argsPending()) {

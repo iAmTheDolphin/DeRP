@@ -12,6 +12,7 @@ class Lexeme implements Types{
     int lineNumber;
     Lexeme left;
     Lexeme right;
+    boolean tf;
 
     Lexeme() {
         this.type = null;
@@ -90,6 +91,9 @@ class Lexeme implements Types{
         else if (this.type == REAL) {
             System.out.println(this.type + " : " + this.realVal);
         }
+        else if (this.type == BOOL) {
+            System.out.println(this.type + " : " + this.tf);
+        }
         else if (this.type == UNKNOWN) {
             System.out.println("ERROR: " + this.type + " on line " + this.lineNumber + " : " + (char)this.intVal);
         }
@@ -120,6 +124,9 @@ class Lexeme implements Types{
         }
         else if (this.type == REAL) {
             System.out.println(this.realVal);
+        }
+        else if (this.type == BOOL) {
+            System.out.println(this.tf);
         }
         else if (this.type == UNKNOWN) {
             System.out.println("ERROR: " + this.type + " on line " + this.lineNumber + " : " + (char)this.intVal);

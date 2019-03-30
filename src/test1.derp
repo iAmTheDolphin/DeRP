@@ -14,17 +14,20 @@ function test1 using (x, y, z) {
     //lambda using (x) {
     //    print(x)
     //}
-    if x >= y {
+    if x >= y and z < x {
         z = x
     }
+
 	otherwise if x == z {
         y = z
+        print("hello world")
+
     }
     return z
 }
 
 function main using () {
     print(1 + 4)
-    test1() //this will cause an error
+    test1(1, 2, 3) //this will cause an error
 }
 

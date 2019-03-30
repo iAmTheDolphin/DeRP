@@ -47,7 +47,6 @@ public interface Types {
     String RETURN= "RETURN";
     String ENV= "ENV";
     String TABLE= "TABLE";
-    String JOIN= "JOIN";
     String ARRAYDEF= "ARRAY_DEF";
     String VARDEF= "VARDEF";
     String GLUE= "GLUE";
@@ -60,7 +59,6 @@ public interface Types {
     String BODY= "BODY";
     String DEF= "DEF";
     String ARGLIST= "ARGLIST";
-    String VAR= "VAR";
     String LAMBDA= "LAMBDA";
     String CLASS= "CLASS";
     String MAINBOI= "MAINBOI";
@@ -68,5 +66,6 @@ public interface Types {
     String CLOSURE= "CLOSURE";
     String PARAM= "PARAM";
     String ARG= "ARG";
+    String BOOL= "BOOL";
 
 }
