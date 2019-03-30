@@ -67,4 +67,5 @@ public interface Types {
     String CLASS= "CLASS";
     String MAINBOI= "MAINBOI";
     String PRINT= "PRINT";
+    String CLOSURE= "CLOSURE";
 }

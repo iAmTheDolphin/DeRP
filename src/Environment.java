@@ -1,5 +1,7 @@
 public class Environment implements Types{
 
+    private static boolean debug = true;
+
     private static Lexeme cons(String type, Lexeme left, Lexeme right) {
         Lexeme lex = new Lexeme(type);
         lex.left = left;
@@ -28,6 +30,7 @@ public class Environment implements Types{
     }
 
     public static Lexeme getVal(Lexeme env, String id) {
+        if(debug) System.out.println("DEBUG: Env: getVal: " + id);
         while(env != null) {
             Lexeme table = env.left;
             Lexeme vars = table.left;
@@ -47,14 +50,19 @@ public class Environment implements Types{
     }
 
     public static Lexeme insertEnv(Lexeme env, Lexeme var, Lexeme val) {
+        if(debug) System.out.println("DEBUG: Environment: insertEnv: " + var.strVal);
         Lexeme table = env.left;
         table.left = cons(JOIN, var,  table.left);
         table.right = cons(JOIN, val, table.right);
         return val;
     }
 
-    public static Lexeme extendEnv(Lexeme env) {
+    public static Lexeme extendEnv(Lexeme env, Lexeme) {
         return cons(ENV, createEnv(), env);
+    }
+
+    public static Lexeme extendEnv(Lexeme senv, Lexeme vars, Lexeme vals) {
+        return cons(ENV, cons(TABLE, vars, vals), senv);
     }
 
 }

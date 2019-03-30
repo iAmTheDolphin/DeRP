@@ -55,7 +55,8 @@ public class Parser implements Types{
     public static Lexeme mainBoi() {
         Lexeme mb = new Lexeme(MAINBOI);
         mb.left = program();
-        mb.right = new Lexeme(FUNCTIONCALL, "main");
+        mb.right = new Lexeme(FUNCTIONCALL);
+        mb.right.left = new Lexeme(ID, "main");
         mb.right.right = new Lexeme(PARAMLIST);
         return mb;
     }
@@ -121,7 +122,7 @@ public class Parser implements Types{
      */
     private static Lexeme lambdaDef() {
         recursionDepth++;
-        if(debug) System.out.println("DEBUG: lambda def " + recursionDepth);
+        if(debug) System.out.println("DEBUG: Parser: lambda def " + recursionDepth);
 
         Lexeme func = match(LAMBDA);
         func.left = null;
@@ -151,7 +152,7 @@ public class Parser implements Types{
      */
     private static Lexeme defs() {
         recursionDepth++;
-        if(debug) System.out.println("DEBUG: defs " + recursionDepth);
+        if(debug) System.out.println("DEBUG: Parser: defs " + recursionDepth);
         Lexeme def = new Lexeme("DEF");
         if(functionDefPending()) {
             def.type = DEF;
@@ -174,7 +175,7 @@ public class Parser implements Types{
             def.left = classDef();
         }
         else {
-            if(debug) System.out.println("DEBUG: called def but there was no def pending");
+            if(debug) System.out.println("DEBUG: Parser: called def but there was no def pending");
         }
         recursionDepth --;
         return def;
@@ -194,7 +195,7 @@ public class Parser implements Types{
         Lexeme arrDef = new Lexeme(ARRAYDEF);
 
         recursionDepth++;
-        if(debug) System.out.println("DEBUG: array def " + recursionDepth);
+        if(debug) System.out.println("DEBUG: Parser: array def " + recursionDepth);
 
         match(LIST);
         arrDef.left = unary();
@@ -218,7 +219,7 @@ public class Parser implements Types{
      */
     private static Lexeme varDef() {
         recursionDepth++;
-        if(debug) System.out.println("DEBUG: var def " + recursionDepth);
+        if(debug) System.out.println("DEBUG: Parser: var def " + recursionDepth);
         Lexeme var = new Lexeme(VARDEF);
         match(VARIABLE);
         var.left = match(ID);
@@ -237,7 +238,7 @@ public class Parser implements Types{
      *          returns either DEF or expression
      */
     private static Lexeme exprAndDefs() {
-        if(debug) System.out.println("DEBUG: exprAndDefs " + recursionDepth);
+        if(debug) System.out.println("DEBUG: Parser: exprAndDefs " + recursionDepth);
         Lexeme l = null;
         if(defsPending()) {
             l = defs();
@@ -246,7 +247,7 @@ public class Parser implements Types{
             l = expression();
         }
         else if(printPending()) {
-            if(debug) System.out.println("DEBUG: print was pending. Parsing...");
+            if(debug) System.out.println("DEBUG: Parser: print was pending. Parsing...");
             l = print();
         }
         return l;
@@ -272,9 +273,9 @@ public class Parser implements Types{
      *                     //
      *                  body
      */
-    private static Lexeme functionDef () {
+    private static Lexeme   functionDef () {
         recursionDepth++;
-        if(debug) System.out.println("DEBUG: function def " + recursionDepth);
+        if(debug) System.out.println("DEBUG: Parser: function def " + recursionDepth);
 
         Lexeme func = match(FUNCTION);
         func.left = match(ID);

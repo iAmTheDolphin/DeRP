@@ -95,6 +95,14 @@ class Lexeme implements Types{
         }
         else {
             System.out.println(this.type);
+            if(this.left != null) {
+                System.out.print("left: ");
+                this.left.display();
+            }
+            if(this.right != null) {
+                System.out.print("right: ");
+                this.right.display();
+            }
         }
         //System.out.println(this.type + " on line " + this.lineNumber + " : " + this.intVal + this.realVal + this.strVal);
     }
