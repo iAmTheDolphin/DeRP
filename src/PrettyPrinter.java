@@ -114,6 +114,12 @@ public class PrettyPrinter implements Types{
                 prettyPrint(tree.right);
                 break;
             }
+            case MOD : {
+                prettyPrint(tree.left);
+                System.out.print("% ");
+                prettyPrint(tree.right);
+                break;
+            }
             case OTHERWISE : {
                 System.out.print("otherwise ");
                 prettyPrint(tree.left);

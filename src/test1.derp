@@ -29,7 +29,8 @@ function test1 using (x, y, z) {
 }
 
 function main using () {
-    print(1 + 4)
+    print(17 % 5)
+    print("mod ^^")
     test1(5, 2, 3)
 
     z = 1

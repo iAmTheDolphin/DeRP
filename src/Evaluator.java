@@ -142,6 +142,9 @@ public class Evaluator implements Types{
             case NOTEQUAL : {
                 return evalNotEqual(tree, env);
             }
+            case MOD : {
+                return evalMod(tree, env);
+            }
 
             default: System.out.println("ERROR EVALUATING: UNDEFINED TYPE: " + tree.type);
             System.exit(1);
@@ -267,6 +270,29 @@ public class Evaluator implements Types{
         }
     }
 
+    private static Lexeme evalMod(Lexeme tree, Lexeme env) {
+        if(debug) System.out.println("DEBUG: Eval: evalMod: ");
+        Lexeme l = eval(tree.left, env);
+        Lexeme r = eval(tree.right, env);
+        if (l.type == INT && r.type == INT){
+            return new Lexeme(INT, l.intVal % r.intVal);
+        }
+        else if(l.type == INT && r.type == REAL){
+            return new Lexeme (REAL, l.intVal % r.realVal);
+        }
+        else if(l.type == REAL && r.type == INT) {
+            return new Lexeme(REAL, l.realVal % r.intVal);
+        }
+        else if(l.type == REAL && r.type == REAL) {
+            return new Lexeme(REAL, l.realVal % r.realVal);
+        }
+        else {
+            System.out.println("ERROR: BAD TYPE SENT TO Mod " + l.type + " * " + r.type);
+            System.exit(1);
+            return null;
+        }
+    }
+
     private static void evalDef(Lexeme tree, Lexeme env) {
         if(debug) System.out.println("DEBUG: Eval: evalDef: ");
         eval(tree.left, env);
@@ -312,7 +338,6 @@ public class Evaluator implements Types{
         Lexeme senv = closure.left;
         Lexeme evaledArgs = eval(arglist, env);
         Lexeme xenv = Environment.extendEnv(senv, params, evaledArgs);
-        System.out.print("yeet extended envs ");
         return eval(body, xenv);
         //return eval(body, xenv);
     }

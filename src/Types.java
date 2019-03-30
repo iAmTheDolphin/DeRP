@@ -67,5 +67,6 @@ public interface Types {
     String PARAM= "PARAM";
     String ARG= "ARG";
     String BOOL= "BOOL";
+    String MOD= "MOD";
 
 }

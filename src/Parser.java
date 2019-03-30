@@ -586,7 +586,7 @@ public class Parser implements Types{
     }
 
     private static boolean operatorPending() {
-        return (check(PLUS) || check(MINUS) || check(TIMES) || check(DIVIDES) || check(ASSIGN));
+        return (check(PLUS) || check(MINUS) || check(TIMES) || check(DIVIDES) || check(ASSIGN) || check(MOD));
     }
 
     private static Lexeme operator() {
@@ -611,6 +611,7 @@ public class Parser implements Types{
         }
         else if(check(TIMES)) return match(TIMES);
         else if(check(DIVIDES))return match(DIVIDES);
+        else if(check(MOD)) return match(MOD);
         else return match(ASSIGN);
     }
 
