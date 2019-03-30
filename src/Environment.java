@@ -17,11 +17,11 @@ public class Environment implements Types{
      *   // \\       //  \\
      *  id   GLUE   val   JOIN
      */
-    public Lexeme createEnv() {
+    public static Lexeme createEnv() {
         return cons(ENV, cons(TABLE, null, null), null);
     }
 
-    private void insertEnv(Lexeme env, String id, Lexeme val){
+    public static void insertEnv(Lexeme env, String id, Lexeme val){
         Lexeme table = env.left;
         table.left = cons(JOIN, new Lexeme(ID, id),  table.left);
         table.right = cons(JOIN, val, table.right);
@@ -46,14 +46,14 @@ public class Environment implements Types{
         return null;
     }
 
-    private Lexeme insertEnv(Lexeme env, Lexeme var, Lexeme val) {
+    public static Lexeme insertEnv(Lexeme env, Lexeme var, Lexeme val) {
         Lexeme table = env.left;
         table.left = cons(JOIN, var,  table.left);
         table.right = cons(JOIN, val, table.right);
         return val;
     }
 
-    public Lexeme extendEnv(Lexeme env) {
+    public static Lexeme extendEnv(Lexeme env) {
         return cons(ENV, createEnv(), env);
     }
 

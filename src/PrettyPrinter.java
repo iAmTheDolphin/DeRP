@@ -148,6 +148,16 @@ public class PrettyPrinter implements Types{
                 prettyPrint(tree.left);
                 break;
             }
+            case MAINBOI : {
+                prettyPrint(tree.left);
+                break;
+            }
+            case PRINT : {
+                System.out.print("print ( ");
+                prettyPrint(tree.right);
+                System.out.print(") ");
+                break;
+            }
             default: System.out.println("UNDEFINED TYPE: " + tree.type);
         }
     }

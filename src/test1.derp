@@ -1,6 +1,15 @@
 //DERP test1.derp
 // Parker Jones
 
+//class x {
+//    function tester using  (t, q, r) {
+//        q = r
+//        ++t
+//    }
+//    variable x = 0
+//}
+
+
 function test1 using (x, y, z) {
     lambda using (x) {
         print(x)
@@ -15,6 +24,7 @@ function test1 using (x, y, z) {
 }
 
 function main using (x) {
+    print(1 + 4)
     test1()
 }
 

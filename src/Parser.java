@@ -2,7 +2,7 @@ import java.io.File;
 
 public class Parser implements Types{
 
-    private static final boolean debug = false;
+    private static final boolean debug = true;
     private static int recursionDepth = 0;
 
     private static Lexeme current;
@@ -52,6 +52,14 @@ public class Parser implements Types{
         }
     }
 
+    public static Lexeme mainBoi() {
+        Lexeme mb = new Lexeme(MAINBOI);
+        mb.left = program();
+        mb.right = new Lexeme(FUNCTIONCALL, "main");
+        mb.right.right = new Lexeme(PARAMLIST);
+        return mb;
+    }
+
     /*
      *                  program()
      *           def
@@ -77,17 +85,46 @@ public class Parser implements Types{
     }
 
     private static boolean defsPending() {
-        return(functionDefPending() || arrayDefPending() || varDefPending() || lambdaDefPending());
+        return(functionDefPending() || arrayDefPending() || varDefPending() || lambdaDefPending() || classDefPending());
+    }
+
+    private static boolean classDefPending() { return check(CLASS); }
+
+    /*
+     *                  class()
+     *                  CLASS
+     *                 //   \\
+     *               ID      def
+     *                         \\
+     *                          def
+     */
+    private static Lexeme classDef() {
+        Lexeme c = match(CLASS);
+        c.left = match(ID);
+        match(OBRACE);
+        c.right = program();
+        match(CBRACE);
+        return c;
     }
 
     private static boolean lambdaDefPending() {return check(LAMBDA);}
 
+    /*
+     *          lambdaDef()
+     *           LAMBDA
+     *         //      \\
+     *      null        GLUE
+     *               //    \\
+     *           argList    GLUE
+     *                     //
+     *                  body
+     */
     private static Lexeme lambdaDef() {
         recursionDepth++;
         if(debug) System.out.println("DEBUG: lambda def " + recursionDepth);
 
         Lexeme func = match(LAMBDA);
-        func.left = new Lexeme();
+        func.left = null;
         match(USING);
         match(OPAREN);
         Lexeme argglue = func.right = new Lexeme(GLUE);
@@ -131,6 +168,13 @@ public class Parser implements Types{
         else if(lambdaDefPending()) {
             def.type = DEF;
             def.left = lambdaDef();
+        }
+        else if(classDefPending()) {
+            def.type = DEF;
+            def.left = classDef();
+        }
+        else {
+            if(debug) System.out.println("DEBUG: called def but there was no def pending");
         }
         recursionDepth --;
         return def;
@@ -185,7 +229,7 @@ public class Parser implements Types{
     }
 
     private static boolean exprAndDefsPending() {
-        return (defsPending() || exprListPending());
+        return (defsPending() || exprListPending() || printPending());
     }
 
     /*
@@ -201,7 +245,21 @@ public class Parser implements Types{
         else if(expressionPending()) {
             l = expression();
         }
+        else if(printPending()) {
+            if(debug) System.out.println("DEBUG: print was pending. Parsing...");
+            l = print();
+        }
         return l;
+    }
+
+    private static boolean printPending() { return check(PRINT); }
+
+    private static Lexeme print() {
+        Lexeme p = match(PRINT);
+        match(OPAREN);
+        p.right = paramList();
+        match(CPAREN);
+        return p;
     }
 
     /*
@@ -325,15 +383,18 @@ public class Parser implements Types{
 
         if(check(INT)){
             l.type = INT;
-            l.left = match(INT);
+            l.intVal = current.intVal;
+            match(INT);
         }
         else if(check(REAL)) {
             l.type = REAL;
-            l.left = match(REAL);
+            l.realVal = current.realVal;
+            match(REAL);
         }
         else if(check(STRING)) {
             l.type = STRING;
-            l.left = match(STRING);
+            l.strVal = current.strVal;
+            match(STRING);
         }
         else if(check(OPAREN)) {
             match(OPAREN);
@@ -411,6 +472,14 @@ public class Parser implements Types{
         return check(OBRACE);
     }
 
+    /*
+     *          body()
+     *             BODY
+     *                 \\
+     *                  GLUE
+     *                 //   \\
+     *       exprAndDefs()    GLUE
+     */
     private static Lexeme body() {
         Lexeme block = new Lexeme(BODY);
         recursionDepth++;
@@ -440,6 +509,15 @@ public class Parser implements Types{
         return ( ifdefPending() || loopPending() || unaryExprPending() || check(RETURN));
     }
 
+
+    /*
+     *          expression()
+     *         LOOP/RETURN/IF/UnaryEXpr
+     *               //
+     * loop() / null / expression() / unaryExpr()
+     *
+     *
+     */
     private static Lexeme expression() {
         recursionDepth++;
         if(debug) System.out.println("DEBUG: expression " + recursionDepth);
@@ -467,6 +545,10 @@ public class Parser implements Types{
         return unaryPending();
     }
 
+    /*
+     *          unaryExpr()
+     *
+     */
     private static Lexeme unaryExpr() {
         recursionDepth++;
         if(debug) System.out.println("DEBUG: unary expr " + recursionDepth);
