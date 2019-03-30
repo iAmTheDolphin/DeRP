@@ -29,14 +29,29 @@ function test1 using (x, y, z) {
 
 function main using () {
     print(1 + 4)
-    test1(5, 2, 3) //this will cause an error
+    test1(5, 2, 3)
 
     z = 1
     print(z  + 1)
-    z = 2
 
+    list ar [100]
+    ar [1] = 5
+    print(ar[1])
+    ar[1] = 6
+    ar[2] = 8
+    ar[3] = " yeet"
+    print(ar[1] + ar[2] + ar[3])
+    print ("array is " + ar[1])
+    z = 6
+
+     z = z - 1
+     print(z)
+
+     loop while z > 0 {
+        print(ar[3])
         z = z - 1
-    print(z)
+     }
+    //print(z)
 
 }
 

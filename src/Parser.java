@@ -177,7 +177,7 @@ public class Parser implements Types{
     }
 
     private static boolean arrayDefPending() {
-        return check(ARRAY);
+        return check(LIST);
     }
 
     /*
@@ -193,7 +193,7 @@ public class Parser implements Types{
         if(debug) System.out.println("DEBUG: Parser: array def " + recursionDepth);
 
         match(LIST);
-        arrDef.left = unary();
+        arrDef.left = match(ID);
         match(OBRACKET);
         arrDef.right = unary();
         match(CBRACKET);

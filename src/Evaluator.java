@@ -1,4 +1,5 @@
 import java.io.File;
+import java.util.ArrayList;
 
 public class Evaluator implements Types{
     private final static boolean debug = true;
@@ -122,6 +123,13 @@ public class Evaluator implements Types{
             case ASSIGN : {
                 evalAssign(tree, env);
                 break;
+            }
+            case ARRAYDEF : {
+                evalArrayDef(tree, env);
+                break;
+            }
+            case ARRAYCALL : {
+                return evalArrayCall(tree, env);
             }
 
             default: System.out.println("ERROR EVALUATING: UNDEFINED TYPE: " + tree.type);
@@ -473,19 +481,34 @@ public class Evaluator implements Types{
 
     private static Lexeme evalAssign(Lexeme tree, Lexeme env) {
         Lexeme val = eval(tree.right, env);
-        tree.left.left.debug();
-        return Environment.updateEnv(env, tree.left.left.strVal, val);
+        tree.left.debug();
+        if(tree.left.type == ARRAYCALL) {
+            Lexeme a = Environment.getVal(env, tree.left.left.strVal);
+            int index = tree.left.right.intVal;
+            //System.out.println(a.a.get(index));
+            a.a[index] = val;
+            return val;
+        }
+        else {
+            return Environment.updateEnv(env, tree.left.left.strVal, val);
+        }
     }
 
-//    private static Lexeme evalDecrement(Lexeme tree, Lexeme env) {
-//        Lexeme fakeCalc = new Lexeme(MINUS);
-//        fakeCalc.left = tree.left;
-//        fakeCalc.right = new Lexeme(INT);
-//
-//        tree.left.debug();
-//        //return
-//        System.exit(0);
-//        return null;
-//    }
+    private static Lexeme evalArrayDef(Lexeme tree, Lexeme env) {
+        tree.debug();
+        Lexeme initialLen = tree.right;
+        Lexeme id = tree.left;
+        Lexeme[] x = new Lexeme[initialLen.intVal];
+        Lexeme list = new Lexeme(ARRAY);
+        list.a = x;
+        return Environment.insertEnv(env, id, list);
+    }
+
+    private static Lexeme evalArrayCall(Lexeme tree, Lexeme env) {
+        Lexeme a = Environment.getVal(env, tree.left.strVal);
+        tree.debug();
+        a.debug();
+        return a.a[tree.right.intVal];
+    }
 }
 

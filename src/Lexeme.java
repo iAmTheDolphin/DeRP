@@ -1,5 +1,6 @@
 //Lexeme.java
 //Parker Jones
+import java.util.ArrayList;
 class Lexeme implements Types{
 
     private final boolean dbug = true;
@@ -13,6 +14,7 @@ class Lexeme implements Types{
     Lexeme left;
     Lexeme right;
     boolean tf;
+    Lexeme[] a;
 
     Lexeme() {
         this.type = null;
