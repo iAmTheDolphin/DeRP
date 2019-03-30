@@ -44,6 +44,12 @@ conditionals : classes
 conditionalsx : classes
 	java Evaluator conditionals.derp
 
+recursion : classes
+	java Parser recursion.derp
+
+recursionx : classes
+	java Evaluator recursion.derp
+
 clean:
 	rm -f *.class
 
