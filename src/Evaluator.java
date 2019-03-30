@@ -117,7 +117,7 @@ public class Evaluator implements Types{
                 break;
             }
             case EQUALS : {
-                return evalEquals();
+                return evalEquals(tree, env);
             }
 
             default: System.out.println("ERROR EVALUATING: UNDEFINED TYPE: " + tree.type);
@@ -415,6 +415,46 @@ public class Evaluator implements Types{
 
     private static void evalOtherwise(Lexeme tree, Lexeme env) {
         eval(tree.left, env);
+    }
+
+    private static Lexeme evalEquals(Lexeme tree, Lexeme env) {
+        if(debug) System.out.println("DEBUG: Eval: evalPlus: ");
+
+        Lexeme l = eval(tree.left, env);
+        Lexeme r = eval(tree.right, env);
+        if (l.type == INT && r.type == INT){
+            return new Lexeme(BOOL, l.intVal == r.intVal);
+        }
+        else if(l.type == INT && r.type == REAL){
+            return new Lexeme (BOOL, (double)l.intVal == r.realVal);
+        }
+        else if(l.type == REAL && r.type == INT) {
+            return new Lexeme(BOOL,  l.realVal == (double)r.intVal );
+        }
+        else if(l.type == REAL && r.type == REAL) {
+            return new Lexeme(BOOL, l.realVal == r.realVal);
+        }
+        else if(l.type == STRING && r.type == INT) {
+            return new Lexeme(BOOL, l.strVal.equals(Integer.toString( r.intVal)));
+        }
+        else if(l.type == STRING && r.type == REAL) {
+            return new Lexeme(BOOL, l.strVal.equals(Double.toString(r.realVal)));
+        }
+        else if(l.type == STRING && r.type == STRING) {
+            return new Lexeme(BOOL, l.strVal.equals(r.strVal));
+        }
+        else if(l.type == INT && r.type == STRING) {
+            return new Lexeme(BOOL, r.strVal.equals(Integer.toString( l.intVal)));
+        }
+        else if(l.type == REAL && r.type == STRING) {
+            return new Lexeme(BOOL, r.strVal.equals(Double.toString( l.intVal)));
+        }
+        else {
+            System.out.println("ERROR: BAD TYPE SENT TO == " + l.type + " + " + r.type);
+            System.exit(1);
+            return null;
+        }
+
     }
 
     //FIXME all the ARGS are coming up as the last arg

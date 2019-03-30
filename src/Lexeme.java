@@ -31,6 +31,16 @@ class Lexeme implements Types{
         right = null;
     }
 
+    Lexeme(String type, Boolean x ) {
+        //make a lexeme
+        this.type = type;
+        strVal = null;
+        lineNumber = Scanner.lineNumber;
+        left = null;
+        right = null;
+        tf = x;
+    }
+
     Lexeme(String type, int intVal) {
         this.type = type;
         this.intVal = intVal;
