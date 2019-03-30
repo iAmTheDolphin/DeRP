@@ -1,43 +1,43 @@
-JFLAGS = -g
-JC = javac
-JVM = java Recognizer
+MAIN = Evaluator
+JC = javac -g
+JVM = java $(MAIN)
 .SUFFIXES: .java .class
 .java.class:
 	$(JC) $(JFLAGS) $*.java
 
 CLASSES = \
+	Types.class \
+	Lexeme.class \
+	Lexer.class \
+	Parser.class \
+	Environment.class \
+	PrettyPrinter.class \
+	Evaluator.class \
+
+SRC = \
 	Types.java \
 	Lexeme.java \
 	Lexer.java \
-	Recognizer.java \
+	Parser.java \
+	Environment.java \
+	PrettyPrinter.java \
+	Evaluator.java \
 
-MAIN = Recognizer
 
 default: classes
+	$(JC) $(SRC)
 
 classes: $(CLASSES:.java=.class)
 
-recognizer : Recognizer.class
-	$(JC) Recognizer.java
-
-test1 : $(MAIN).class
+evaluator : Evaluator.class
 	$(JVM) test1.derp
 
-test2: $(MAIN).class
-	$(JVM) test2.derp
+arrays : classes
+	java Parser arrays.derp
 
-test3: $(MAIN).class
-	$(JVM) test3.derp
-
-test4: $(MAIN).class
-	$(JVM) test4.derp
-
-test5: $(MAIN).class
-	$(JVM) test5.derp
-
-run : $(MAIN).class
-	$(JVM) $(MAIN) test1.derp
+arraysx : classes
+	java Evaluator arrays.derp
 
 clean:
-	$(RM) *.class
+	rm -f *.class
 

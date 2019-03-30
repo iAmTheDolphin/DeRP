@@ -1,0 +1,29 @@
+function main using () {
+
+	list x [10]
+
+	x[0] = 1500
+
+	print("x[0] is : " + x[0])
+	print("moving yeet in to x[9]")
+
+	x[9] = "yeet"
+
+	print(x[9])
+
+	print("--------------------------------")
+	z = 9
+	loop while z > 0 {
+		print(z)
+		x[z] = z
+		print(x[z])
+		z = z - 1
+	}
+
+
+	z = 9
+    loop while z > 0 {
+    	print(x[z])
+    	z = z - 1
+    }
+}

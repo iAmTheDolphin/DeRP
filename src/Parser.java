@@ -2,7 +2,7 @@ import java.io.File;
 
 public class Parser implements Types{
 
-    private static final boolean debug = true;
+    private static final boolean debug = false;
     private static int recursionDepth = 0;
 
     private static Lexeme current;
@@ -19,10 +19,8 @@ public class Parser implements Types{
         lex = new Lexer(file);
         advance();
         Lexeme prog = program();
-
         PrettyPrinter.prettyPrint(prog);
-
-        System.out.println("\nLEGAL");
+        System.out.println();
     }
 
     public static Lexeme advance() {

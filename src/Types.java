@@ -68,5 +68,6 @@ public interface Types {
     String ARG= "ARG";
     String BOOL= "BOOL";
     String MOD= "MOD";
+    String DEBUGPRINTMEM= "DEBUGPRINTMEM";
 
 }

@@ -98,9 +98,21 @@ public class PrettyPrinter implements Types{
                 prettyPrint(tree.right);
                 break;
             }
+            case GREATERTHAN : {
+                prettyPrint(tree.left);
+                System.out.print("> ");
+                prettyPrint(tree.right);
+                break;
+            }
             case LESSTHAN : {
                 prettyPrint(tree.left);
                 System.out.print("< ");
+                prettyPrint(tree.right);
+                break;
+            }
+            case LESSTHANEQUAL : {
+                prettyPrint(tree.left);
+                System.out.print("<= ");
                 prettyPrint(tree.right);
                 break;
             }
@@ -210,7 +222,7 @@ public class PrettyPrinter implements Types{
                 prettyPrint(tree.right);
                 break;
             }
-            default: System.out.println("UNDEFINED TYPE: " + tree.type);
+            default: System.out.println("Pretty: UNDEFINED TYPE: " + tree.type);
         }
     }
 }

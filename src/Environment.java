@@ -47,7 +47,7 @@ public class Environment implements Types{
         }
         t.left.debug();
         t.right.left.left.debug();
-        System.out.println("ERROR : VARIABLE NOT FOUND SCREEEEEEEE");
+        System.out.println("ERROR : VARIABLE " + id +" NOT FOUND SCREEEEEEEE");
         System.exit(1);
         return null;
     }
@@ -86,5 +86,31 @@ public class Environment implements Types{
         table.left = cons(PARAM, new Lexeme(ID, id),  table.left);
         table.right = cons(ARG, val, table.right);
         return val;
+    }
+
+    public static void debugEnv(Lexeme env) {
+        System.out.println("Debuging ENV: (called by evalLambda)");
+        String curTabs = "";
+        Lexeme curVars  = env.left.left;
+        Lexeme curVals  = env.left.right;
+        while(env != null) {
+            while (curVals.left != null && curVars.left != null) {
+                System.out.print(curTabs + "VAR: " + curVars.left.strVal + "   VAL: ");
+                if(curVals.left.type == ARRAY){
+                    System.out.println("ARRAY : ");
+                    for (int x = 0; x < curVals.left.a.length; x++) {
+                        System.out.print(curTabs + "\t");
+                        if(curVals.left.a[x] != null) curVals.left.a[x].display();
+                        else System.out.println(" null ");
+                    }
+                }
+                else curVals.left.display();
+
+                curVals = curVals.right;
+                curVars = curVars.right;
+            }
+            curTabs += "\t";
+            env = env.right;
+        }
     }
 }

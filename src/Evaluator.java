@@ -7,11 +7,11 @@ public class Evaluator implements Types{
     public static void main (String[] args)  {
         Parser.setup(new File(args[0])); // setup the Parser with the file it needs to parse
         Lexeme lex = Parser.mainBoi(); //get the Lexeme pointing to the head of the parse tree
-        PrettyPrinter.prettyPrint(lex); // pretty print the shit
-        System.out.println();
+        //PrettyPrinter.prettyPrint(lex); // pretty print the shit
+        //System.out.println();
         Lexeme env = Environment.createEnv();
         eval(lex, env);
-        System.out.println("done");
+        System.out.println("-done-");
     }
 
 
@@ -101,8 +101,14 @@ public class Evaluator implements Types{
             case GREATERTHANEQUAL : {
                 return evalGreaterThanEqual(tree, env);
             }
+            case GREATERTHAN : {
+                return evalGreaterThan(tree, env);
+            }
             case LESSTHAN : {
                 return evalLessThan(tree, env);
+            }
+            case LESSTHANEQUAL : {
+                return evalLessThanEqual(tree, env);
             }
             case VAREXPR : {
                 return evalVarExpr(tree, env);
@@ -136,8 +142,8 @@ public class Evaluator implements Types{
                 break;
             }
             case WHILE : {
-                evalWhile(tree, env);
-                break;
+                return evalWhile(tree, env);
+                //break;
             }
             case NOTEQUAL : {
                 return evalNotEqual(tree, env);
@@ -145,6 +151,14 @@ public class Evaluator implements Types{
             case MOD : {
                 return evalMod(tree, env);
             }
+            case LAMBDA : {
+                return evalLambda(tree, env);
+            }
+            case VARDEF : {
+                evalVarDef(tree, env);
+                break;
+            }
+
 
             default: System.out.println("ERROR EVALUATING: UNDEFINED TYPE: " + tree.type);
             System.exit(1);
@@ -429,6 +443,23 @@ public class Evaluator implements Types{
         return res;
     }
 
+    private static Lexeme evalGreaterThan(Lexeme tree, Lexeme env) {
+        if(debug) System.out.println("DEBUG: Eval: evalGreaterThanEqual: ");
+
+        Lexeme l = eval(tree.left, env);
+        Lexeme r = eval(tree.right, env);
+        Lexeme res = new Lexeme(BOOL);
+        if(l.type == INT && r.type == INT) res.tf = l.intVal > r.intVal;
+        else if (l.type == INT && r.type == REAL) res.tf = l.intVal > r.realVal;
+        else if (l.type == REAL && r.type == INT) res.tf = l.realVal > r.intVal;
+        else if (l.type == REAL && r.type == REAL) res.tf = l.realVal > r.realVal;
+        else {
+            System.out.println("ERROR: INCOMPATABLE TYPE WITH >. MUST BE AN INT OR REAL");
+            System.exit(1);
+        }
+        return res;
+    }
+
     private static Lexeme evalLessThan(Lexeme tree, Lexeme env) {
         if(debug) System.out.println("DEBUG: Eval: LessThan: ");
 
@@ -441,6 +472,23 @@ public class Evaluator implements Types{
         else if (l.type == REAL && r.type == REAL) res.tf = l.realVal < r.realVal;
         else {
             System.out.println("ERROR: INCOMPATABLE TYPE WITH <. MUST BE AN INT OR REAL");
+            System.exit(1);
+        }
+        return res;
+    }
+
+    private static Lexeme evalLessThanEqual (Lexeme tree, Lexeme env) {
+        if(debug) System.out.println("DEBUG: Eval: LessThan: ");
+
+        Lexeme l = eval(tree.left, env);
+        Lexeme r = eval(tree.right, env);
+        Lexeme res = new Lexeme(BOOL);
+        if(l.type == INT && r.type == INT) res.tf = l.intVal <= r.intVal;
+        else if (l.type == INT && r.type == REAL) res.tf = l.intVal <= r.realVal;
+        else if (l.type == REAL && r.type == INT) res.tf = l.realVal <= r.intVal;
+        else if (l.type == REAL && r.type == REAL) res.tf = l.realVal <= r.realVal;
+        else {
+            System.out.println("ERROR: INCOMPATABLE TYPE WITH <=. MUST BE AN INT OR REAL");
             System.exit(1);
         }
         return res;
@@ -520,12 +568,15 @@ public class Evaluator implements Types{
     }
 
     private static Lexeme evalAssign(Lexeme tree, Lexeme env) {
+        if(debug) System.out.println("DEBUG: Eval: evalAssign: ");
+
         Lexeme val = eval(tree.right, env);
         if(tree.left.type == ARRAYCALL) {
             Lexeme a = Environment.getVal(env, tree.left.left.strVal);
-            int index = tree.left.right.intVal;
+            int index = eval(tree.left.right, env).intVal;
             //System.out.println(a.a.get(index));
             a.a[index] = val;
+            Environment.updateEnv(env, tree.left.left.strVal, a);
             return val;
         }
         else {
@@ -545,17 +596,41 @@ public class Evaluator implements Types{
 
     private static Lexeme evalArrayCall(Lexeme tree, Lexeme env) {
         Lexeme a = Environment.getVal(env, tree.left.strVal);
-        return a.a[tree.right.intVal];
+        if(tree.right.type == INT)
+            return a.a[tree.right.intVal];
+        else if(tree.right.type == VAREXPR)
+            return a.a[eval(tree.right, env).intVal];
+        else {
+            System.out.println("ERROR: UNSUPPORTED ARRAY LOOK UP INDEX TYPE. USE INT OR A VARIABLE EXPRESSION");
+            System.exit(1);
+            return null;
+        }
     }
 
     private static void evalLoop(Lexeme tree, Lexeme env) {
         eval(tree.left, env);
     }
 
-    private static void evalWhile(Lexeme tree, Lexeme env) {
+    private static Lexeme evalWhile(Lexeme tree, Lexeme env) {
+        Lexeme res = new Lexeme();
         while(eval(tree.left, env).tf) {
-            eval(tree.right, env);
+            res = eval(tree.right, env);
         }
+        return res;
+    }
+
+    private static Lexeme evalLambda(Lexeme tree, Lexeme env) {
+        Environment.debugEnv(env);
+        Lexeme closure = new Lexeme(CLOSURE);
+        closure.left = env;
+        closure.right = tree;
+        return closure;
+    }
+
+    private static void evalVarDef(Lexeme tree, Lexeme env) {
+        tree.debug();
+        Environment.insertEnv(env, tree.left, tree.right);
+        //System.exit(25);
     }
 }
 
