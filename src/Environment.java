@@ -35,7 +35,7 @@ public class Environment implements Types{
             Lexeme table = env.left;
             Lexeme vars = table.left;
             Lexeme vals = table.right;
-            while(vars != null) {
+            while(vars != null && vars.left != null) {
                 if (id.equals(vars.left.strVal)) {
                     return vals.left;
                 }
@@ -57,11 +57,12 @@ public class Environment implements Types{
         return val;
     }
 
-    public static Lexeme extendEnv(Lexeme env, Lexeme) {
+    public static Lexeme extendEnv(Lexeme env) {
         return cons(ENV, createEnv(), env);
     }
 
     public static Lexeme extendEnv(Lexeme senv, Lexeme vars, Lexeme vals) {
+        if(debug) System.out.println("DEBUG: Environment: extendEnv: ");
         return cons(ENV, cons(TABLE, vars, vals), senv);
     }
 

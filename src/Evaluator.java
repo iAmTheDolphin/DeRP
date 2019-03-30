@@ -1,7 +1,7 @@
 import java.io.File;
 
 public class Evaluator implements Types{
-    private static boolean debug = true;
+    private final static boolean debug = true;
 
     public static void main (String[] args)  {
         Parser.setup(new File(args[0])); // setup the Parser with the file it needs to parse
@@ -50,16 +50,6 @@ public class Evaluator implements Types{
 //                prettyPrint(tree.right);
                 return evalDIV(tree, env);
             }
-            case INCREMENT : {
-//                prettyPrint(tree.left);
-//                System.out.print("++ ");
-                break;
-            }
-            case DECREMENT : {
-//                prettyPrint(tree.left);
-//                System.out.print("-- ");
-                break;
-            }
             case DEF : {
 //                if(tree.left != null) prettyPrint(tree.left);
 //                if(tree.right != null ) prettyPrint(tree.right);
@@ -74,71 +64,13 @@ public class Evaluator implements Types{
                 evalFunction(tree, env);
                 break;
             }
-            case LAMBDA : {
-//                System.out.print("lambda using ");
-//                prettyPrint(tree.right);
-                //break;
-            }
-            case GLUE : {
-//                if(tree.left != null ) prettyPrint(tree.left);
-//                if(tree.right != null) prettyPrint(tree.right);
-                //break;
-            }
-            case ID : {
-//                System.out.print(tree.strVal + " ");
-                //break;
-            }
+
             case BODY : {
 //                System.out.print("{ ");
 //                if (tree.right != null) prettyPrint(tree.right);
 //                System.out.print("} ");
                 //break;
-            }
-            case IF : {
-//                System.out.print("if ");
-//                prettyPrint(tree.left);
-//                prettyPrint(tree.right);
-                //break;
-            }
-            case ARG : {
-//                prettyPrint(tree.left);
-//                if(tree.right != null) {
-//                    System.out.print(", ");
-//                    prettyPrint(tree.right);
-//                }
-                //break;
-            }
-            case CONDITIONLIST : {
-//                prettyPrint(tree.left);
-//                if(tree.right != null)prettyPrint(tree.right);
-                //break;
-            }
-            case GREATERTHANEQUAL : {
-//                prettyPrint(tree.left);
-//                System.out.print(">= ");
-//                prettyPrint(tree.right);
-                //break;
-            }
-            case VAREXPR : {
-//                prettyPrint(tree.left);
-                //break;
-            }
-            case ASSIGN : {
-//                prettyPrint(tree.left);
-//                System.out.print("= ");
-//                prettyPrint(tree.right);
-                //break;
-            }
-            case OTHERWISE : {
-//                System.out.print("otherwise ");
-//                prettyPrint(tree.left);
-                //break;
-            }
-            case EQUALS : {
-//                prettyPrint(tree.left);
-//                System.out.print("== ");
-//                prettyPrint(tree.right);
-                //break;
+                return evalBody(tree, env);
             }
             case FUNCTIONCALL : {
 //                prettyPrint(tree.left);
@@ -146,35 +78,30 @@ public class Evaluator implements Types{
                 //break;
                 return evalFunctionCall(tree, env);
             }
-            case PARAMLIST : {
-//                System.out.print("( ");
-//                if(tree.left != null) prettyPrint(tree.left);
-//                if(tree.right != null) prettyPrint(tree.right);
-//                System.out.print(") ");
-                //break;
-            }
-            case ARGLIST : {
-//                System.out.print("( ");
-//                if(tree.left != null) prettyPrint(tree.left);
-//                System.out.print(") ");
-                //break;
-            }
-            case VARDEF : {
-//                System.out.print("variable ");
-//                prettyPrint(tree.left);
-//                System.out.print("= ");
-//                prettyPrint(tree.right);
-//                //System.out.print(" ");
-                //break;
-            }
-            case RETURN : {
-//                System.out.print("return ");
-//                prettyPrint(tree.left);
-                //break;
-            }
             case MAINBOI : {
-                return evalMainBoi(tree, env);
+                evalMainBoi(tree, env);
+                break;
             }
+            case PRINT : {
+                evalPrint(tree, env);
+                break;
+            }
+            case PARAMLIST : {
+                return evalParamList(tree, env);
+            }
+            case IF : {
+                return evalIF(tree, env);
+            }
+            case CONDITIONLIST : {
+                return evalConditionList(tree, env);
+            }
+            case GREATERTHANEQUAL : {
+                return evalGreaterThanEqual(tree, env);
+            }
+            case VAREXPR : {
+                return evalVarExpr(tree, env);
+            }
+
             default: System.out.println("ERROR EVALUATING: UNDEFINED TYPE: " + tree.type);
             System.exit(1);
             return null;
@@ -182,10 +109,11 @@ public class Evaluator implements Types{
         return null;
     }
 
-    private static Lexeme evalMainBoi(Lexeme tree, Lexeme env) {
-        if(debug) System.out.println("DEBUG: Eval: evalMainBoi: ");
+    private static void evalMainBoi(Lexeme tree, Lexeme env) {
+        if(debug) System.out.println("DEBUG: Eval: evalMainBoi: left");
         eval(tree.left, env);
-        return (eval(tree.right, env));
+        if(debug) System.out.println("DEBUG: Eval: evalMainBoi: right");
+        eval(tree.right, env);
     }
 
     private static Lexeme evalPlus(Lexeme tree, Lexeme env) {
@@ -316,6 +244,7 @@ public class Evaluator implements Types{
          */
         closure.left = env;
         closure.right = tree;
+
         Environment.insertEnv(env, tree.left, closure);
     }
 
@@ -328,13 +257,95 @@ public class Evaluator implements Types{
         Lexeme closure = Environment.getVal(env, fcID.strVal);
         Lexeme funct = closure.right;
         Lexeme arglist = tree.right;
-        Lexeme params = funct.right.left;
+        Lexeme params = funct.right.left.left;
+        System.out.println("______________marker_________________");
+        funct.right.left.debug();
+        //params.debug();
+        arglist.debug();
+        System.out.println("______________/marker_________________");
         Lexeme body = funct.right.right.left;
         Lexeme senv = closure.left;
         Lexeme evaledArgs = eval(arglist, env);
         Lexeme xenv = Environment.extendEnv(senv, params, evaledArgs);
-        senv.debug();
-        return null;
+        //senv.debug();
+        //body.debug();
+        return eval(body, xenv);
         //return eval(body, xenv);
     }
+
+    private static Lexeme evalBody(Lexeme tree, Lexeme env) {
+        if(debug) System.out.println("DEBUG: Eval: evalBody: ");
+        Lexeme cur = tree.right;
+        Lexeme result = null;
+        while(cur != null) {
+            result = eval(cur.left, env);
+            cur = cur.right;
+        }
+        return result;
+    }
+
+    private static void evalPrint(Lexeme tree, Lexeme env) {
+        if(debug) System.out.println("DEBUG: Eval: evalPrint: ");
+        tree.right.debug();
+        //eval the args to print then print them
+        eval(tree.right, env).print();
+    }
+
+    //I messed up early on and named my arguments params and it has haunted me
+    private static Lexeme evalParamList(Lexeme tree, Lexeme env) {
+        if(debug) System.out.println("DEBUG: Eval: evalBody: ");
+        Lexeme arg = tree;
+        Lexeme val = null;
+        arg.debug();
+
+        while(arg != null && arg.left != null){
+            Lexeme temp = val;
+            val = eval(arg.left, env);
+            val.right = temp;
+            arg = arg.right;
+        }
+        return (val);
+    }
+
+    private static Lexeme evalIF(Lexeme tree, Lexeme env) {
+        if(debug) System.out.println("DEBUG: Eval: evalIF: ");
+        tree.debug();
+        Lexeme bool = eval(tree.left, env); // evaluate the condition list
+        System.exit(11);
+        return null;
+    }
+
+    private static Lexeme evalConditionList(Lexeme tree, Lexeme env) {
+        if(debug) System.out.println("DEBUG: Eval: evalConditionList: ");
+        //need to evaluate left, then maybe there will be a glue to the right if there is a linker
+        tree.debug();
+        Lexeme res = eval(tree.left, env);
+        System.exit(11);
+        return null;
+    }
+
+    private static Lexeme evalGreaterThanEqual(Lexeme tree, Lexeme env) {
+        if(debug) System.out.println("DEBUG: Eval: evalGreaterThanEqual: ");
+
+        tree.debug();
+        Lexeme l = eval(tree.left, env);
+        Lexeme r = eval(tree.right, env);
+        System.exit(11);
+        return null;
+    }
+
+    private static Lexeme evalVarExpr(Lexeme tree, Lexeme env) {
+        if(debug) System.out.println("DEBUG: Eval: evalVarExpr: ");
+
+        env.left.debug();
+        env.left.left.debug();
+        env.left.left.left.debug();
+
+        Lexeme var = tree.left;
+        Lexeme val = Environment.getVal(env, var.strVal);
+
+        System.exit(11);
+        return null;
+    }
 }
+

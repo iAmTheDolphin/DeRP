@@ -1,6 +1,9 @@
 //Lexeme.java
 //Parker Jones
 class Lexeme implements Types{
+
+    private final boolean dbug = true;
+
     Environment parentEnv;
     String type;
     int intVal;
@@ -103,6 +106,29 @@ class Lexeme implements Types{
                 System.out.print("right: ");
                 this.right.display();
             }
+        }
+        //System.out.println(this.type + " on line " + this.lineNumber + " : " + this.intVal + this.realVal + this.strVal);
+    }
+
+    public void print() {
+        if(dbug) System.out.print("---------------------------------------------------------->>");
+        if (this.type == INT) {
+            System.out.println(this.intVal);
+        }
+        else if (this.type == STRING) {
+            System.out.println(this.strVal);
+        }
+        else if (this.type == REAL) {
+            System.out.println(this.realVal);
+        }
+        else if (this.type == UNKNOWN) {
+            System.out.println("ERROR: " + this.type + " on line " + this.lineNumber + " : " + (char)this.intVal);
+        }
+        else if (this.type == BAD_NUMBER) {
+            System.out.println("ERROR: " + this.type + " on line " + this.lineNumber + " : " + this.strVal);
+        }
+        else {
+            System.out.println(this.type);
         }
         //System.out.println(this.type + " on line " + this.lineNumber + " : " + this.intVal + this.realVal + this.strVal);
     }

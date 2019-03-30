@@ -11,9 +11,9 @@
 
 
 function test1 using (x, y, z) {
-    lambda using (x) {
-        print(x)
-    }
+    //lambda using (x) {
+    //    print(x)
+    //}
     if x >= y {
         z = x
     }
@@ -23,8 +23,8 @@ function test1 using (x, y, z) {
     return z
 }
 
-function main using (x) {
+function main using () {
     print(1 + 4)
-    test1()
+    test1() //this will cause an error
 }
 
