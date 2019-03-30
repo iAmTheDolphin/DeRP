@@ -2,7 +2,7 @@ import java.io.File;
 
 public class Parser implements Types{
 
-    private static final boolean debug = false;
+    private static final boolean debug = true;
     private static int recursionDepth = 0;
 
     private static Lexeme current;
@@ -563,7 +563,7 @@ public class Parser implements Types{
             Lexeme temp = op;
             op = operator();
             op.left = temp;
-            op.right = unary();
+            op.right = unaryExpr();
         }
         else if (compPending()) {
             Lexeme temp = op;
@@ -593,8 +593,22 @@ public class Parser implements Types{
         recursionDepth++;
         if(debug) System.out.println("DEBUG: operator " + recursionDepth);
         recursionDepth--;
-        if(check(PLUS)) return match(PLUS);
-        else if(check(MINUS)) return match(MINUS);
+        if(check(PLUS)) {
+            match(PLUS);
+            if(check(PLUS)) {
+                match(PLUS);
+                return (new Lexeme(INCREMENT));
+            }
+            else return new Lexeme (PLUS);
+        }
+        else if(check(MINUS)) {
+            match(MINUS);
+            if(check(MINUS)) {
+                match(MINUS);
+                return (new Lexeme(DECREMENT));
+            }
+            else return new Lexeme (MINUS);
+        }
         else if(check(TIMES)) return match(TIMES);
         else if(check(DIVIDES))return match(DIVIDES);
         else return match(ASSIGN);

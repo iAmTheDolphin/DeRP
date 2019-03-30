@@ -60,10 +60,31 @@ public class Environment implements Types{
         return val;
     }
 
-
     public static Lexeme extendEnv(Lexeme senv, Lexeme vars, Lexeme vals) {
         if(debug) System.out.println("DEBUG: Environment: extendEnv: ");
         return cons(ENV, cons(TABLE, vars, vals), senv);
     }
 
+    public static Lexeme updateEnv(Lexeme env, String id, Lexeme val) {
+        Lexeme t = env;
+        if(debug) System.out.println("DEBUG: Env: updateVal: " + id);
+        while(env != null) {
+            Lexeme table = env.left;
+            Lexeme vars = table.left;
+            Lexeme vals = table.right;
+            while(vars != null && vars.left != null) {
+                if (id.equals(vars.left.strVal) && vals.left != null) {
+                    vals.left = val;
+                    return vals.left;
+                }
+                vars = vars.right;
+                vals = vals.right;
+            }
+            env = env.right;
+        }
+        Lexeme table = t.left;
+        table.left = cons(PARAM, new Lexeme(ID, id),  table.left);
+        table.right = cons(ARG, val, table.right);
+        return val;
+    }
 }

@@ -119,6 +119,10 @@ public class Evaluator implements Types{
             case EQUALS : {
                 return evalEquals(tree, env);
             }
+            case ASSIGN : {
+                evalAssign(tree, env);
+                break;
+            }
 
             default: System.out.println("ERROR EVALUATING: UNDEFINED TYPE: " + tree.type);
             System.exit(1);
@@ -457,20 +461,31 @@ public class Evaluator implements Types{
 
     }
 
-    //FIXME all the ARGS are coming up as the last arg
     private static Lexeme evalArg(Lexeme tree, Lexeme env) {
         if(debug) System.out.println("DEBUG: Eval: evalArg: ");
-        Lexeme arg = tree;
-        Lexeme val = new Lexeme(ARG);
-        arg.debug();
+        Lexeme placeholder = new Lexeme(ARG);
+        placeholder.left = eval(tree.left, env);
 
-        while(arg != null && arg.left != null){
-            Lexeme temp = val;
-            val.left = eval(arg.left, env);
-            val.right = temp;
-            arg = arg.right;
-        }
-        return (val);
+        placeholder.right = eval(tree.right, env);
+
+        return (placeholder);
     }
+
+    private static Lexeme evalAssign(Lexeme tree, Lexeme env) {
+        Lexeme val = eval(tree.right, env);
+        tree.left.left.debug();
+        return Environment.updateEnv(env, tree.left.left.strVal, val);
+    }
+
+//    private static Lexeme evalDecrement(Lexeme tree, Lexeme env) {
+//        Lexeme fakeCalc = new Lexeme(MINUS);
+//        fakeCalc.left = tree.left;
+//        fakeCalc.right = new Lexeme(INT);
+//
+//        tree.left.debug();
+//        //return
+//        System.exit(0);
+//        return null;
+//    }
 }
 

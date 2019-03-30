@@ -15,9 +15,10 @@ function test1 using (x, y, z) {
     //    print(x)
     //}
     if x >= y and z < x {
+        print("here we are")
         z = x
-    }
 
+    }
 	otherwise if x == z {
         //y = z
         print("hello world")
@@ -28,6 +29,14 @@ function test1 using (x, y, z) {
 
 function main using () {
     print(1 + 4)
-    test1(1, 2, 3) //this will cause an error
+    test1(5, 2, 3) //this will cause an error
+
+    z = 1
+    print(z  + 1)
+    z = 2
+
+        z = z - 1
+    print(z)
+
 }
 
