@@ -1,6 +1,6 @@
 public class Environment implements Types{
 
-    private static boolean debug = true;
+    private static boolean debug = false;
 
     private static Lexeme cons(String type, Lexeme left, Lexeme right) {
         Lexeme lex = new Lexeme(type);

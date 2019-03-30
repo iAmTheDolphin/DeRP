@@ -3,7 +3,7 @@
 import java.util.ArrayList;
 class Lexeme implements Types{
 
-    private final boolean dbug = true;
+    private final boolean dbug = false;
 
     Environment parentEnv;
     String type;

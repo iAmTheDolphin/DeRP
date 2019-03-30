@@ -2,7 +2,7 @@ import java.io.File;
 import java.util.ArrayList;
 
 public class Evaluator implements Types{
-    private final static boolean debug = true;
+    private final static boolean debug = false;
 
     public static void main (String[] args)  {
         Parser.setup(new File(args[0])); // setup the Parser with the file it needs to parse
@@ -130,6 +130,17 @@ public class Evaluator implements Types{
             }
             case ARRAYCALL : {
                 return evalArrayCall(tree, env);
+            }
+            case LOOP : {
+                evalLoop(tree, env);
+                break;
+            }
+            case WHILE : {
+                evalWhile(tree, env);
+                break;
+            }
+            case NOTEQUAL : {
+                return evalNotEqual(tree, env);
             }
 
             default: System.out.println("ERROR EVALUATING: UNDEFINED TYPE: " + tree.type);
@@ -302,8 +313,6 @@ public class Evaluator implements Types{
         Lexeme evaledArgs = eval(arglist, env);
         Lexeme xenv = Environment.extendEnv(senv, params, evaledArgs);
         System.out.print("yeet extended envs ");
-        //senv.debug();
-        //body.debug();
         return eval(body, xenv);
         //return eval(body, xenv);
     }
@@ -469,6 +478,12 @@ public class Evaluator implements Types{
 
     }
 
+    private static Lexeme evalNotEqual(Lexeme tree, Lexeme env) {
+        Lexeme temp = evalEquals(tree,env);
+        temp.tf = ! temp.tf;
+        return temp;
+    }
+
     private static Lexeme evalArg(Lexeme tree, Lexeme env) {
         if(debug) System.out.println("DEBUG: Eval: evalArg: ");
         Lexeme placeholder = new Lexeme(ARG);
@@ -481,7 +496,6 @@ public class Evaluator implements Types{
 
     private static Lexeme evalAssign(Lexeme tree, Lexeme env) {
         Lexeme val = eval(tree.right, env);
-        tree.left.debug();
         if(tree.left.type == ARRAYCALL) {
             Lexeme a = Environment.getVal(env, tree.left.left.strVal);
             int index = tree.left.right.intVal;
@@ -495,7 +509,7 @@ public class Evaluator implements Types{
     }
 
     private static Lexeme evalArrayDef(Lexeme tree, Lexeme env) {
-        tree.debug();
+
         Lexeme initialLen = tree.right;
         Lexeme id = tree.left;
         Lexeme[] x = new Lexeme[initialLen.intVal];
@@ -506,9 +520,17 @@ public class Evaluator implements Types{
 
     private static Lexeme evalArrayCall(Lexeme tree, Lexeme env) {
         Lexeme a = Environment.getVal(env, tree.left.strVal);
-        tree.debug();
-        a.debug();
         return a.a[tree.right.intVal];
+    }
+
+    private static void evalLoop(Lexeme tree, Lexeme env) {
+        eval(tree.left, env);
+    }
+
+    private static void evalWhile(Lexeme tree, Lexeme env) {
+        while(eval(tree.left, env).tf) {
+            eval(tree.right, env);
+        }
     }
 }
 

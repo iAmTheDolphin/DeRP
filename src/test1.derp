@@ -24,6 +24,7 @@ function test1 using (x, y, z) {
         print("hello world")
 
     }
+    if x != 0 test1(0, 1, 1)
     return z
 }
 
@@ -39,7 +40,7 @@ function main using () {
     print(ar[1])
     ar[1] = 6
     ar[2] = 8
-    ar[3] = " yeet"
+    ar[3] = "yeet"
     print(ar[1] + ar[2] + ar[3])
     print ("array is " + ar[1])
     z = 6
@@ -47,8 +48,8 @@ function main using () {
      z = z - 1
      print(z)
 
-     loop while z > 0 {
-        print(ar[3])
+     loop while z >= 0 {
+        print(ar[3] + z)
         z = z - 1
      }
     //print(z)

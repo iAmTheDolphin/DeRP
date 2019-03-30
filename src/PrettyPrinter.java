@@ -50,6 +50,7 @@ public class PrettyPrinter implements Types{
                 System.out.print("using ( ");
                 if(tree.right.left != null) prettyPrint(tree.right.left);
                 System.out.print(") ");
+                prettyPrint(tree.right.right.left);
                 break;
             }
             case LAMBDA : {
@@ -79,9 +80,11 @@ public class PrettyPrinter implements Types{
                 break;
             }
             case PARAM : {
-                System.out.print("( ");
                 if(tree.left != null) prettyPrint(tree.left);
-                System.out.print(") ");
+                if(tree.right != null) {
+                    System.out.print(", ");
+                    prettyPrint(tree.right);
+                }
                 break;
             }
             case CONDITIONLIST : {
@@ -92,6 +95,12 @@ public class PrettyPrinter implements Types{
             case GREATERTHANEQUAL : {
                 prettyPrint(tree.left);
                 System.out.print(">= ");
+                prettyPrint(tree.right);
+                break;
+            }
+            case LESSTHAN : {
+                prettyPrint(tree.left);
+                System.out.print("< ");
                 prettyPrint(tree.right);
                 break;
             }
@@ -118,20 +127,18 @@ public class PrettyPrinter implements Types{
             }
             case FUNCTIONCALL : {
                 prettyPrint(tree.left);
+                System.out.print("( ");
                 prettyPrint(tree.right);
+                System.out.print(") ");
                 break;
             }
             case ARG : {
-                System.out.print("( ");
+
                 if(tree.left != null) prettyPrint(tree.left);
-                if(tree.right != null) prettyPrint(tree.right);
-                System.out.print(") ");
-                break;
-            }
-            case ARGLIST : {
-                System.out.print("( ");
-                if(tree.left != null) prettyPrint(tree.left);
-                System.out.print(") ");
+                if(tree.right != null) {
+                    System.out.print(", ");
+                    prettyPrint(tree.right);
+                }
                 break;
             }
             case VARDEF : {
@@ -155,6 +162,46 @@ public class PrettyPrinter implements Types{
                 System.out.print("print ( ");
                 prettyPrint(tree.right);
                 System.out.print(") ");
+                break;
+            }
+            case NOTEQUAL : {
+                prettyPrint(tree.left);
+                System.out.print("!= ");
+                prettyPrint(tree.right);
+                break;
+            }
+            case LINKER : {
+                prettyPrint(tree.left);
+                break;
+            }
+            case AND : {
+                System.out.print("and ");
+                break;
+            }
+            case ARRAYDEF: {
+                System.out.print("list ");
+                prettyPrint(tree.left);
+                System.out.print("[");
+                prettyPrint(tree.right);
+                System.out.print("] ");
+                break;
+            }
+            case ARRAYCALL : {
+                prettyPrint(tree.left);
+                System.out.print("[ ");
+                prettyPrint(tree.right);
+                System.out.print("] ");
+                break;
+            }
+            case LOOP : {
+                System.out.print("loop ");
+                prettyPrint(tree.left);
+                break;
+            }
+            case WHILE : {
+                System.out.print("while ");
+                prettyPrint(tree.left);
+                prettyPrint(tree.right);
                 break;
             }
             default: System.out.println("UNDEFINED TYPE: " + tree.type);
