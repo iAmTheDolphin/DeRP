@@ -13,15 +13,16 @@ function main using () {
 
 	print("--------------------------------")
 	z = 9
+
+	print("loading x[] with a loop")
 	loop while z > 0 {
 		print(z)
 		x[z] = z
-		print(x[z])
 		z = z - 1
 	}
-
-
+	lambda using () {}
 	z = 9
+	print("printing x[] with a loop")
     loop while z > 0 {
     	print(x[z])
     	z = z - 1
