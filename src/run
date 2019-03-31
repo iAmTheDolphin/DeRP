@@ -1,0 +1,17 @@
+#!/bin/bash
+FIRST=$1
+SECOND=$2
+rm -f *.class
+javac Types.java \
+      	Lexeme.java \
+      	Lexer.java \
+      	Parser.java \
+      	Environment.java \
+      	PrettyPrinter.java \
+      	Evaluator.java \
+
+if [ "$FIRST" == "-r" ]; then
+	java Parser $SECOND
+else
+	java Evaluator $FIRST $SECOND
+fi
