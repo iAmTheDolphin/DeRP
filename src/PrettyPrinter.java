@@ -146,7 +146,7 @@ public class PrettyPrinter implements Types{
             case FUNCTIONCALL : {
                 prettyPrint(tree.left);
                 System.out.print("( ");
-                prettyPrint(tree.right);
+                if(tree.right != null)prettyPrint(tree.right);
                 System.out.print(") ");
                 break;
             }

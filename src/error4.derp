@@ -1,0 +1,10 @@
+function nope using (x) {
+
+	print("I will not run " + x)
+}
+
+function main using () {
+
+	nope()
+
+}

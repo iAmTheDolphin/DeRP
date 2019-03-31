@@ -62,6 +62,24 @@ error1 : classes
 error1x : classes
 	java Evaluator error1.derp
 
+error2 : classes
+	java Parser error2.derp
+
+error2x : classes
+	java Evaluator error2.derp
+
+error3 : classes
+	java Parser error3.derp
+
+error3x : classes
+	java Evaluator error3.derp
+
+error4 : classes
+	java Parser error4.derp
+
+error4x : classes
+	java Evaluator error4.derp
+
 clean:
 	rm -f *.class
 
