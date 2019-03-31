@@ -1,0 +1,22 @@
+function main using () {
+
+	variable z = 99
+	variable t = z
+
+	//lambda using () {}
+	loop while z > 0 {
+		t = z - 1
+		print("" + z + " bottles of beer on the wall, " + z + " bottles of beer!")
+		if t == 1 {
+			print("Take one down pass it around, you got " + t + " bottle of beer on the wall!")
+		}
+		otherwise if t == 0 {
+			print("Take one down pass it around, now you're all out of beer!")
+		}
+		otherwise {
+			print("Take one down pass it around, you got " + t + " bottles of beer on the wall!")
+		}
+		z = z - 1
+	}
+	print("Guess we need to go get more.")
+}

@@ -50,6 +50,12 @@ recursion : classes
 recursionx : classes
 	java Evaluator recursion.derp
 
+iteration : classes
+	java Parser iteration.derp
+
+iterationx : classes
+	java Evaluator iteration.derp
+
 clean:
 	rm -f *.class
 

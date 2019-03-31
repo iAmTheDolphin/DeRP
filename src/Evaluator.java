@@ -207,7 +207,7 @@ public class Evaluator implements Types{
             return new Lexeme(STRING, "" + l.realVal + r.strVal);
         }
         else {
-            System.out.println("ERROR: BAD TYPE SENT TO PLUS " + l.type + " + " + r.type);
+            System.out.println("ERROR: PLUS: BAD TYPE SENT TO PLUS " + l.type + " + " + r.type);
             System.exit(1);
             return null;
         }
@@ -621,6 +621,8 @@ public class Evaluator implements Types{
 
     private static Lexeme evalLambda(Lexeme tree, Lexeme env) {
         Environment.debugEnv(env);
+        Environment.getVal(env, "t").debug();
+
         Lexeme closure = new Lexeme(CLOSURE);
         closure.left = env;
         closure.right = tree;
@@ -628,7 +630,7 @@ public class Evaluator implements Types{
     }
 
     private static void evalVarDef(Lexeme tree, Lexeme env) {
-        Environment.insertEnv(env, tree.left, tree.right);
+        Environment.insertEnv(env, tree.left, eval(tree.right, env));
         //System.exit(25);
     }
 }
