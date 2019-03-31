@@ -1,0 +1,11 @@
+function test1 using () {
+	function test2 using () {
+		return "we returned a function, then called it, and then printed the result which is this line"
+	}
+}
+
+function main using () {
+
+	print(test1()())
+
+}

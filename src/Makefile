@@ -92,6 +92,12 @@ error5 : classes
 error5x : classes
 	java Evaluator error5.derp
 
+functions : classes
+	java Parser functions.derp
+
+functionsx : classes
+	java Evaluator functions.derp
+
 clean:
 	rm -f *.class
 

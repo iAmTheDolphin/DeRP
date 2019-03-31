@@ -15,6 +15,9 @@ run <file to run>.derp
 To Print the file back to you use
 run -r <file to print>.derp
 
+all executions of DERP will end with `-done-` which is printed by
+the DERP evaluator automatically to signify a successful execution.
+
 
 ## Hello World
 all programs in DERP must have a main function which will

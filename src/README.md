@@ -1,7 +1,16 @@
 # DERP
+
+##Dependencies
+Dependencies:
+
+Java. Written on Java 11, can possibly run on earlier versions. To check your version run $java -version
+
+make. depending on your package manager this could be different. commonly obtained with $apt-get install make -y
+
 ## Running a Program in DERP
 to run a program in DERP use the command `run <file to run>.derp` . To Print the file back to you use `run -r <file to print>.derp`
 
+all executions of DERP will end with `-done-` which is printed by the DERP evaluator automatically to signify a successful execution.
 
 ## Hello World
 all programs in DERP must have a main function which will be called to begin execution after the program has been parsed.
