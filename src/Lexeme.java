@@ -20,7 +20,7 @@ class Lexeme implements Types{
         this.type = null;
         this.left = null;
         this.right = null;
-        this.lineNumber = Scanner.lineNumber;
+        this.lineNumber = Scanner.lineNumber ;
     }
 
 
@@ -28,7 +28,7 @@ class Lexeme implements Types{
         //make a lexeme
         this.type = type;
         strVal = str;
-        lineNumber = Scanner.lineNumber;
+        lineNumber = Scanner.lineNumber ;
         left = null;
         right = null;
     }
@@ -37,7 +37,7 @@ class Lexeme implements Types{
         //make a lexeme
         this.type = type;
         strVal = null;
-        lineNumber = Scanner.lineNumber;
+        lineNumber = Scanner.lineNumber ;
         left = null;
         right = null;
         tf = x;

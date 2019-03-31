@@ -1,0 +1,3 @@
+#!/bin/bash
+make
+java Parser $1

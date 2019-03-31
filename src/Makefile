@@ -56,6 +56,12 @@ iteration : classes
 iterationx : classes
 	java Evaluator iteration.derp
 
+error1 : classes
+	java Parser error1.derp
+
+error1x : classes
+	java Evaluator error1.derp
+
 clean:
 	rm -f *.class
 

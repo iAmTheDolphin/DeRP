@@ -1,0 +1,5 @@
+function main () {
+
+	print("this would print if I didn't mess up the function def")
+
+}

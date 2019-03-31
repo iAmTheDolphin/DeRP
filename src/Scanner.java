@@ -7,6 +7,6 @@ import java.nio.channels.FileLockInterruptionException;
 
 public class Scanner implements Types{
 
-    public static int lineNumber = 0;
+    public static int lineNumber = 1;
 
 }
