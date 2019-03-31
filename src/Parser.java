@@ -485,6 +485,18 @@ public class Parser implements Types{
         }
     }
 
+    private static boolean objectPending() {
+        return check(OBJECTDEF);
+    }
+
+    private static Lexeme objectDef() {
+        Lexeme o = match(OBJECTDEF);
+        o.left = match(ID);
+        match(USING);
+        o.right = match(ID);
+        return o;
+    }
+
     /*
      *          body()
      *             BODY
@@ -500,13 +512,16 @@ public class Parser implements Types{
 
         match(OBRACE);
         Lexeme parent = block;
-        while(exprAndDefsPending() || fileioPending()) {
+        while(exprAndDefsPending() || fileioPending() || objectPending()) {
             Lexeme glue = new Lexeme(GLUE);
             if(exprAndDefsPending()) {
                 glue.left = exprAndDefs();
             }
             else if(fileioPending()) {
                 glue.left = fileIO();
+            }
+            else if(objectPending()) {
+                glue.left = objectDef();
             }
             if(glue.left == null) {
                 break;
@@ -606,7 +621,7 @@ public class Parser implements Types{
     }
 
     private static boolean operatorPending() {
-        return (check(PLUS) || check(MINUS) || check(TIMES) || check(DIVIDES) || check(ASSIGN) || check(MOD));
+        return (check(PLUS) || check(MINUS) || check(TIMES) || check(DIVIDES) || check(ASSIGN) || check(MOD) || check(DOT));
     }
 
     private static Lexeme operator() {
@@ -632,6 +647,7 @@ public class Parser implements Types{
         else if(check(TIMES)) return match(TIMES);
         else if(check(DIVIDES))return match(DIVIDES);
         else if(check(MOD)) return match(MOD);
+        else if(check(DOT)) return match(DOT);
         else return match(ASSIGN);
     }
 

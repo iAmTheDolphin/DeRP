@@ -1,6 +1,6 @@
 function main using () {
 
-	variable z = 99
+	variable z = 5
 	variable t = z
 
 	//lambda using () {}

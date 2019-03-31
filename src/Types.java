@@ -58,7 +58,6 @@ public interface Types {
     String LINKER = "LINKER";
     String BODY= "BODY";
     String DEF= "DEF";
-    String ARGLIST= "ARGLIST";
     String LAMBDA= "LAMBDA";
     String CLASS= "CLASS";
     String MAINBOI= "MAINBOI";
@@ -71,5 +70,7 @@ public interface Types {
     String FILEOPEN= "FILEOPEN";
     String FILEREAD= "FILEREAD";
     String SCANNER= "SCANNER";
-    String EOFile= "EOF";
+    String OBJECTDEF= "OBJECTDEF";
+    String OBJECT= "OBJECT";
+    String DOT= "DOT";
 }

@@ -232,6 +232,27 @@ public class PrettyPrinter implements Types{
                 System.out.print("fileRead ( ) ");
                 break;
             }
+            case CLASS : {
+                System.out.print("class ");
+                prettyPrint(tree.left);
+                System.out.print("{ ");
+                prettyPrint(tree.right);
+                System.out.print("} ");
+                break;
+            }
+            case OBJECTDEF : {
+                System.out.print("object ");
+                prettyPrint(tree.left);
+                System.out.print("using ");
+                prettyPrint(tree.right);
+                break;
+            }
+            case DOT : {
+                prettyPrint(tree.left);
+                System.out.print(".");
+                prettyPrint(tree.right);
+                break;
+            }
             default: System.out.println("Pretty: UNDEFINED TYPE: " + tree.type);
         }
     }

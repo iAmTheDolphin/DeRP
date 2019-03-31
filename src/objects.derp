@@ -1,0 +1,16 @@
+
+class test {
+	function o using () {
+		print("calling a function in an object.")
+	}
+	function b using () {
+		print("this might work")
+	}
+}
+
+function main using () {
+
+	object x using test
+
+	x.o()
+}

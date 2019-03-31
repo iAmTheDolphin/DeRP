@@ -167,6 +167,16 @@ public class Evaluator implements Types{
             case FILEREAD : {
                 return evalFileRead(tree, env);
             }
+            case CLASS : {
+                evalClassDef(tree, env);
+                break;
+            }
+            case OBJECTDEF : {
+                return evalObjectDef(tree, env);
+            }
+            case DOT : {
+                return evalObjectCall(tree, env);
+            }
 
 
             default: System.out.println("ERROR EVALUATING: UNDEFINED TYPE: " + tree.type);
@@ -665,6 +675,40 @@ public class Evaluator implements Types{
         else {
             return new Lexeme(STRING, "EOF");
         }
+    }
+
+    private static void evalClassDef(Lexeme tree, Lexeme env) {
+        if(debug) System.out.println("DEBUG: Eval: classDef: " + tree.left.strVal);
+        Lexeme closure = new Lexeme(CLOSURE);
+        /*
+         *       CLOSURE
+         *      //     \\
+         *   env      tree
+         */
+        closure.left = env;
+        closure.right = tree;
+
+        Environment.insertEnv(env, tree.left, closure);
+    }
+
+    private static Lexeme evalObjectDef(Lexeme tree, Lexeme env) {
+        Lexeme o = tree.left;
+        Lexeme c = tree.right;
+        Lexeme classClosure = Environment.getVal(env, c.strVal);
+        Lexeme xenv = Environment.extendEnv(env, new Lexeme(PARAM), new Lexeme(ARG));
+        eval(classClosure.right.right, xenv); // now the functions for the objects are loaded into the extended environment
+
+        Lexeme obj = new Lexeme(OBJECT);
+        obj.left = o;
+        obj.objEnv = xenv;
+        obj.right = xenv;
+        Environment.insertEnv(env, o, obj);
+        return obj;
+    }
+
+    private static Lexeme evalObjectCall(Lexeme tree, Lexeme env) {
+        Lexeme l = eval(tree.left, env);
+        return eval(tree.right, l.right); //call the function using the object's extended environment
     }
 }
 

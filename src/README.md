@@ -77,7 +77,28 @@ loop while(x > 0){
 
 
 ## Operators
-The operators accepted in DERP include `+`, `-`, `/`, `*`, `==`, `>`, `<`, `>=`, `<=`, and `%`.
+The operators accepted in DERP include `+`, `-`, `/`, `*`, `==`, `>`, `<`, `>=`, `<=`, `.`, and `%`.
 
 ## Lambdas
 Lambdas are not fully implemented, but they are recognized in the syntax and will be printed by the pretty printer
+
+## Classes
+an example valid class
+```
+class className {
+	function foo using () {
+		print("foo called.")
+	}
+	function bar using () {
+		print("second function.")
+	}
+}
+```
+
+## Objects
+to create an object use 
+`object objectName using className`
+
+to access an objects attributes, 
+`objectName.foo()`
+

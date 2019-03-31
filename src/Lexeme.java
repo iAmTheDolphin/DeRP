@@ -5,7 +5,7 @@ class Lexeme implements Types{
 
     private final boolean dbug = false;
 
-    Environment parentEnv;
+    Lexeme objEnv;
     String type;
     int intVal;
     String strVal;

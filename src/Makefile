@@ -98,6 +98,14 @@ functions : classes
 functionsx : classes
 	java Evaluator functions.derp
 
+objects : classes
+	java Parser objects.derp
+
+objectsx : classes
+	java Evaluator objects.derp
+
+
+
 clean:
 	rm -f *.class
 
