@@ -1,0 +1,9 @@
+function main using () {
+
+	variable t = 4
+
+	t = t % "string here"
+
+	print (t)
+
+}

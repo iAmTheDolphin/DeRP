@@ -80,6 +80,12 @@ error4 : classes
 error4x : classes
 	java Evaluator error4.derp
 
+error5 : classes
+	java Parser error5.derp
+
+error5x : classes
+	java Evaluator error5.derp
+
 clean:
 	rm -f *.class
 
