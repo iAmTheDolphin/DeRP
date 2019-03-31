@@ -1,11 +1,28 @@
-function test1 using () {
+function test1 using (x) {
+
+	//execute insider
+	x()
+
+	//define test2 to be sent back to main
 	function test2 using () {
-		return "we returned a function, then called it, and then printed the result which is this line"
+		return "we returned a function, then called it, and then printed the result which is this line printing"
 	}
+
+	//return test2
+	return test2
 }
 
 function main using () {
 
-	print(test1()())
+	//function to be passed to test1 for execution
+	function insider using () {
+		print("function getting passed")
+	}
+
+	//pass a function to test1 and store the result in x
+	variable x = test1(insider)
+
+	//call x and print the result
+	print(x())
 
 }
