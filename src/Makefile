@@ -104,7 +104,11 @@ objects : classes
 objectsx : classes
 	java Evaluator objects.derp
 
+lambda : classes
+	java Parser lambda.derp
 
+lambdax : classes
+	echo "not implemented   ¯\_(ツ)_/¯"
 
 clean:
 	rm -f *.class

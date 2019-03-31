@@ -1,0 +1,5 @@
+function main using () {
+	lambda using (x) {
+		print(x)
+	}
+}
