@@ -49,15 +49,23 @@ public class Parser implements Types{
             return new Lexeme();
         }
     }
-
-    public static Lexeme mainBoi() {
+    public static Lexeme mainBoi(Lexeme env, String[] args) {
         Lexeme mb = new Lexeme(MAINBOI);
         mb.left = program();
+
+        Lexeme list = new Lexeme(ARRAY);
+        list.a = new Lexeme[100];
+        for (int x = 0; x < args.length; x ++) {
+            list.a[x] = new Lexeme(STRING, args[x]);
+        }
+        Environment.insertEnv(env, new Lexeme(ID, "cmdArgs"), list);
         mb.right = new Lexeme(FUNCTIONCALL);
         mb.right.left = new Lexeme(ID, "main");
         mb.right.right = new Lexeme(ARG); // because we pass no args to main
         return mb;
     }
+
+
 
     /*
      *                  program()
@@ -217,7 +225,7 @@ public class Parser implements Types{
         match(VARIABLE);
         var.left = match(ID);
         match(ASSIGN);
-        var.right = unary();
+        var.right = unaryExpr();
         recursionDepth--;
         return var;
     }
@@ -350,7 +358,7 @@ public class Parser implements Types{
         recursionDepth++;
         if(debug) System.out.println("DEBUG: args list " + recursionDepth);
         Lexeme list = new Lexeme(ARG);
-        list.left = expression();
+        list.left = unaryExpr();
         if(argsPending()) {
             match(COMMA);
             list.right = argsList();
@@ -390,6 +398,9 @@ public class Parser implements Types{
             match(OPAREN);
             l = expression();
             match(CPAREN);
+        }
+        else if(check(FILEREAD)){
+            l = fileIO();
         }
         else if (varExprPending()) {
             l = varExpr();
@@ -445,27 +456,33 @@ public class Parser implements Types{
         return varEx;
     }
 
-    /*
-     *        getArgList()
-     *       returns ARGLIST
-     */
-    private static Lexeme getArgList() {
-        recursionDepth++;
-
-        if(debug) System.out.println("DEBUG: getArgList " + recursionDepth);
-        Lexeme args = new Lexeme(ARGLIST);
-        match(OPAREN);
-        if(argsPending()) {
-            args = argsList();
-        }
-        match(CPAREN);
-
-        recursionDepth--;
-        return args;
-    }
 
     private static boolean bodyPending() {
         return check(OBRACE);
+    }
+
+    private static boolean fileioPending() {return check(FILEOPEN) || check(FILEREAD);}
+
+    private static Lexeme fileIO() {
+        if(check(FILEOPEN)) {
+            Lexeme fileo = match(FILEOPEN);
+
+            // a new closure that can be called with a string
+            fileo.left = new Lexeme(ID, "fileOpen");
+            match(OPAREN);
+            fileo.right = argsList();
+            match(CPAREN);
+            return fileo;
+        }
+        else {
+            Lexeme fileo = match(FILEREAD);
+
+            // a new closure that can be called with a string
+            fileo.left = new Lexeme(ID, "fileRead");
+            match(OPAREN);
+            match(CPAREN);
+            return fileo;
+        }
     }
 
     /*
@@ -483,9 +500,14 @@ public class Parser implements Types{
 
         match(OBRACE);
         Lexeme parent = block;
-        while(exprAndDefsPending()) {
+        while(exprAndDefsPending() || fileioPending()) {
             Lexeme glue = new Lexeme(GLUE);
-            glue.left = exprAndDefs();
+            if(exprAndDefsPending()) {
+                glue.left = exprAndDefs();
+            }
+            else if(fileioPending()) {
+                glue.left = fileIO();
+            }
             if(glue.left == null) {
                 break;
             }

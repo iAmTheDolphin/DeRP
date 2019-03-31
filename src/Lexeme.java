@@ -1,6 +1,6 @@
 //Lexeme.java
 //Parker Jones
-import java.util.ArrayList;
+import java.util.Scanner;
 class Lexeme implements Types{
 
     private final boolean dbug = false;
@@ -15,12 +15,13 @@ class Lexeme implements Types{
     Lexeme right;
     boolean tf;
     Lexeme[] a;
+    Scanner __sc__;
 
     Lexeme() {
         this.type = null;
         this.left = null;
         this.right = null;
-        this.lineNumber = Scanner.lineNumber ;
+        this.lineNumber = LineCounter.lineNumber ;
     }
 
 
@@ -28,7 +29,7 @@ class Lexeme implements Types{
         //make a lexeme
         this.type = type;
         strVal = str;
-        lineNumber = Scanner.lineNumber ;
+        lineNumber = LineCounter.lineNumber ;
         left = null;
         right = null;
     }
@@ -37,7 +38,7 @@ class Lexeme implements Types{
         //make a lexeme
         this.type = type;
         strVal = null;
-        lineNumber = Scanner.lineNumber ;
+        lineNumber = LineCounter.lineNumber ;
         left = null;
         right = null;
         tf = x;
@@ -47,7 +48,7 @@ class Lexeme implements Types{
         this.type = type;
         this.intVal = intVal;
         this.strVal = null;
-        this.lineNumber = Scanner.lineNumber;
+        this.lineNumber = LineCounter.lineNumber;
         this.left = null;
         this.right = null;
     }
@@ -55,7 +56,7 @@ class Lexeme implements Types{
     Lexeme(String type, double realVal) {
         this.realVal = realVal;
         this.type = type;
-        lineNumber = Scanner.lineNumber;
+        lineNumber = LineCounter.lineNumber;
         left = null;
         right = null;
     }
@@ -64,7 +65,7 @@ class Lexeme implements Types{
         this.type = type;
         this.left = null;
         this.right = null;
-        this.lineNumber = Scanner.lineNumber;
+        this.lineNumber = LineCounter.lineNumber;
     }
 
 

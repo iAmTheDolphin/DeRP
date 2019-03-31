@@ -1,0 +1,21 @@
+function main using () {
+
+	variable x = 10
+
+	print("file to open is " + cmdArgs[1])
+
+	fileOpen(cmdArgs[1])
+
+
+	variable store = 0
+	variable s = fileRead()
+	print("summing...")
+	loop while s != "EOF" {
+		print(s)
+		store = store + s
+		s = fileRead()
+	}
+
+	print("=" + store)
+
+}

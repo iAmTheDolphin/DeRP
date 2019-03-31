@@ -20,7 +20,6 @@ function main using () {
 		x[z] = z
 		z = z - 1
 	}
-	lambda using () {}
 	z = 9
 	print("printing x[] with a loop")
     loop while z > 0 {

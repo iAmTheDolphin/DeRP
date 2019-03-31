@@ -1,11 +1,11 @@
-//Scanner.java
+//LineCounter.java
 //Parker Jones
 
 import java.io.*;
 import java.nio.channels.FileLockInterruptionException;
 
 
-public class Scanner implements Types{
+public class LineCounter implements Types{
 
     public static int lineNumber = 1;
 

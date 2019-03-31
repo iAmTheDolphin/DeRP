@@ -68,6 +68,8 @@ public interface Types {
     String ARG= "ARG";
     String BOOL= "BOOL";
     String MOD= "MOD";
-    String DEBUGPRINTMEM= "DEBUGPRINTMEM";
-
+    String FILEOPEN= "FILEOPEN";
+    String FILEREAD= "FILEREAD";
+    String SCANNER= "SCANNER";
+    String EOFile= "EOF";
 }

@@ -222,6 +222,16 @@ public class PrettyPrinter implements Types{
                 prettyPrint(tree.right);
                 break;
             }
+            case FILEOPEN : {
+                System.out.print("fileOpen ( ");
+                prettyPrint(tree.right);
+                System.out.print(") ");
+                break;
+            }
+            case FILEREAD : {
+                System.out.print("fileRead ( ) ");
+                break;
+            }
             default: System.out.println("Pretty: UNDEFINED TYPE: " + tree.type);
         }
     }

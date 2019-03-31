@@ -1,4 +1,6 @@
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.Scanner;
 import java.util.ArrayList;
 
 public class Evaluator implements Types{
@@ -6,10 +8,10 @@ public class Evaluator implements Types{
 
     public static void main (String[] args)  {
         Parser.setup(new File(args[0])); // setup the Parser with the file it needs to parse
-        Lexeme lex = Parser.mainBoi(); //get the Lexeme pointing to the head of the parse tree
+        Lexeme env = Environment.createEnv();
+        Lexeme lex = Parser.mainBoi(env, args); //get the Lexeme pointing to the head of the parse tree
         //PrettyPrinter.prettyPrint(lex); // pretty print the shit
         //System.out.println();
-        Lexeme env = Environment.createEnv();
         eval(lex, env);
         System.out.println("-done-");
     }
@@ -74,6 +76,7 @@ public class Evaluator implements Types{
                 //break;
                 return evalBody(tree, env);
             }
+
             case FUNCTIONCALL : {
 //                prettyPrint(tree.left);
 //                prettyPrint(tree.right);
@@ -157,6 +160,12 @@ public class Evaluator implements Types{
             case VARDEF : {
                 evalVarDef(tree, env);
                 break;
+            }
+            case FILEOPEN : {
+                return evalFileOpen(tree, env);
+            }
+            case FILEREAD : {
+                return evalFileRead(tree, env);
             }
 
 
@@ -345,13 +354,14 @@ public class Evaluator implements Types{
             System.exit(1);
         }
         if(params != null && arglist == null) {
-            System.out.println("ERROR: Function Requires Args");
+            System.out.println("ERROR: Function " + fcID.strVal + " Requires Args");
             System.exit(1);
         }
         Lexeme body = funct.right.right.left;
         Lexeme senv = closure.left;
         Lexeme evaledArgs = eval(arglist, env);
         Lexeme xenv = Environment.extendEnv(senv, params, evaledArgs);
+        //Environment.debugEnv(env);
         return eval(body, xenv);
         //return eval(body, xenv);
     }
@@ -544,9 +554,8 @@ public class Evaluator implements Types{
             return new Lexeme(BOOL, r.strVal.equals(Double.toString( l.intVal)));
         }
         else {
-            System.out.println("ERROR: BAD TYPE SENT TO == " + l.type + " + " + r.type);
-            System.exit(1);
-            return null;
+            System.out.println("Comparing l: " + l.type + " r: " + r.type);
+            return new Lexeme(BOOL, false);
         }
 
     }
@@ -621,7 +630,6 @@ public class Evaluator implements Types{
 
     private static Lexeme evalLambda(Lexeme tree, Lexeme env) {
         Environment.debugEnv(env);
-        Environment.getVal(env, "t").debug();
 
         Lexeme closure = new Lexeme(CLOSURE);
         closure.left = env;
@@ -632,6 +640,31 @@ public class Evaluator implements Types{
     private static void evalVarDef(Lexeme tree, Lexeme env) {
         Environment.insertEnv(env, tree.left, eval(tree.right, env));
         //System.exit(25);
+    }
+
+    private static Lexeme evalFileOpen(Lexeme tree, Lexeme env) {
+        Lexeme arg = eval(tree.right, env);
+        Lexeme filesc = new Lexeme(SCANNER);
+        File file = new File(arg.left.strVal);
+        try {
+            filesc.__sc__ = new Scanner(file);
+        }
+        catch (java.io.FileNotFoundException e) {
+            System.out.println("ERROR: FILE NOT FOUND: " + e );
+            System.exit(1);
+        }
+
+        return Environment.insertEnv(env, new Lexeme(ID, "__fileScanner__"), filesc);
+    }
+
+    private static Lexeme evalFileRead(Lexeme tree, Lexeme env) {
+        Lexeme t = Environment.getVal(env, "__fileScanner__");
+        if(t.__sc__.hasNext()) {
+            return new Lexeme(INT, Integer.parseInt(t.__sc__.next()));
+        }
+        else {
+            return new Lexeme(STRING, "EOF");
+        }
     }
 }
 

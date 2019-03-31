@@ -32,6 +32,12 @@ classes: $(CLASSES:.java=.class)
 evaluator : Evaluator.class
 	$(JVM) test1.derp
 
+problem : classes
+	java Parser problem.derp
+
+problemx : classes
+	java Evaluator problem.derp problemInts.txt
+
 arrays : classes
 	java Parser arrays.derp
 

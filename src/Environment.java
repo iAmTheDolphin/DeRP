@@ -45,8 +45,7 @@ public class Environment implements Types{
             }
             env = env.right;
         }
-        t.left.debug();
-        t.right.left.left.debug();
+        debugEnv(t);
         System.out.println("ERROR : VARIABLE " + id +" NOT FOUND SCREEEEEEEE");
         System.exit(1);
         return null;
@@ -91,10 +90,14 @@ public class Environment implements Types{
     public static void debugEnv(Lexeme env) {
         System.out.println("Debuging ENV: (called by evalLambda)");
         String curTabs = "";
-        Lexeme curVars  = env.left.left;
-        Lexeme curVals  = env.left.right;
+
         while(env != null) {
-            while (curVals.left != null && curVars.left != null) {
+            System.out.println(curTabs + "-----------ENV------------");
+            Lexeme curVars  = env.left.left;
+            Lexeme curVals  = env.left.right;
+
+
+            while (curVals != null && curVars != null && curVals.left != null && curVars.left != null) {
                 System.out.print(curTabs + "VAR: " + curVars.left.strVal + "   VAL: ");
                 if(curVals.left.type == ARRAY){
                     System.out.println("ARRAY : ");
