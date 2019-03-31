@@ -353,7 +353,7 @@ public class Evaluator implements Types{
             System.out.println("ERROR: Attempting to pass args to a function with no parameters");
             System.exit(1);
         }
-        if(params != null && arglist == null) {
+        if(params != null && params.left != null && arglist == null) {
             System.out.println("ERROR: Function " + fcID.strVal + " Requires Args");
             System.exit(1);
         }

@@ -1,61 +1,8 @@
-//DERP test1.derp
-// Parker Jones
 
-//class x {
-//    function tester using  (t, q, r) {
-//        q = r
-//        ++t
-//    }
-//    variable x = 0
-//}
-
-
-function test1 using (x, y, z) {
-
-    if x >= y and z < x {
-        print("here we are")
-        z = x
-
-    }
-	otherwise if x == z {
-        //y = z
-        print("hello world")
-
-    }
-    if x != 0 test1(0, 1, 1)
-    return z
+function test1 using () {
+	return "test"
 }
 
 function main using () {
-    print(17 % 5)
-    print("mod ^^")
-    test1(5, 2, 3)
-
-    variable z = 1
-    print(z  + 1)
-
-    list ar [100]
-    ar [1] = 5
-    print(ar[1])
-    ar[1] = 6
-    ar[2] = 8
-    ar[3] = "yeet"
-    print(ar[1] + ar[2] + ar[3])
-    print ("array is " + ar[1])
-    z = 6
-
-     z = z - 1
-     print(z)
-
-     loop while z >= 0 {
-        print(ar[3] + z)
-        z = z - 1
-     }
-    //print(z)
-
-    lambda using (x) {
-            print(x)
-     }(1)
-
+	print(test1())
 }
-
