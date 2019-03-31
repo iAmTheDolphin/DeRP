@@ -15,6 +15,8 @@ function main using () {
 ## Comments
 to write a comment in DERP, precede the comment with `//`. this will comment out the rest of the line.
 
+example:
+`foo() //this is a comment`
 ## Types
 DERP is dynamically typed so you dont need to type your variables when defining them.
 
